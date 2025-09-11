@@ -1,0 +1,7 @@
+This work contributes a UI that assists the Analysts in analyzing the reports and labeling the extracted indicators.
+The UI has two modes, BAP and GAP, each one used to the corresponding part of the PRISM dataset creation.
+
+We claim that the GAP version which, unlike the BAP, provides the analysts with the proposed label and justification from LANCE, decrease the average time a junior analyst needs analyze a report by ~43% (from 242 s to 138 s).
+
+
+

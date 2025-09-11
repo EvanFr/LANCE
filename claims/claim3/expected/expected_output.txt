@@ -1,0 +1,7 @@
+Analyst3:       BAP Avg: 195.90,        GAP Avg: 131.60
+Analyst4:       BAP Avg: 95.90,         GAP Avg: 59.00
+Analyst5:       BAP Avg: 250.50,        GAP Avg: 134.20
+Analyst2:       BAP Avg: 243.00,        GAP Avg: 111.80
+Analyst1:       BAP Avg: 426.60,        GAP Avg: 252.40
+Overall:        BAP Avg: 242.38,        GAP Avg: 137.80
+Senior Analyst: BAP Avg: 712.60,        GAP Avg: 451.00
