@@ -20,6 +20,11 @@ done
 
 echo "Unzipping completed. [1/6]"
 
+# minor fixes
+cp ./artifact/LANCE_sota_LLMs/Llama/reports.txt ./artifact/LANCE_sota_LLMs/Gemini/reports.txt
+
+sed -i '$d' ./artifact/LANCE_sota_LLMs/transformers_env.yml
+echo "    - iocsearcher==2.4.3" >> artifact/LANCE_sota_LLMs/transformers_env.yml
 # Making sure Anaconda is installed
 
 if command -v conda &> /dev/null; then
