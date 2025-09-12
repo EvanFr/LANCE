@@ -2,7 +2,7 @@
 
 ## Overview
 
-This repository contains the artifacts and evaluation framework for the research paper on **LANCE** (LLM-Assisted iNdicator Context Extraction) and **PRISM** (a curated IoC dataset from threat reports). The work presents a novel approach to automatically extract and label Indicators of Compromise (IoCs) from unstructured cybersecurity threat reports using Large Language Models (LLMs).
+This repository contains the artifacts and evaluation framework for the research paper on **LANCE** (LLM-Assisted Notation and Classification Engine) and **PRISM** (Processed and Reviewed Indicators from Security Media) dataset. The work presents a novel approach to automatically extract and label Indicators of Compromise (IoCs) from unstructured cybersecurity threat reports using Large Language Models (LLMs).
 
 ### Key Contributions
 
