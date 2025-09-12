@@ -67,9 +67,12 @@ This artifact package is designed to enable **comprehensive evaluation and repro
 ### Computational Requirements
 
 1. **System Requirements**
-   - **Minimum**: 8GB RAM, modern multi-core CPU
-   - **Recommended**: 16GB+ RAM, modern multi-core CPU
-   - **GPU**: Optional but recommended for Claims 6 (local LLM processing)
+   - **CPU:***
+      - **Minimum**: 64GB RAM, modern multi-core CPU
+      - **Recommended**: 264GB+ RAM, 48-core CPU
+   - **GPU:**
+      - **Optional**: Optional but recommended for Claims 6 (local LLM processing)
+      - **Recommended**: two NVIDIA A40, CUDA Version: 11.8
    - **Network**: Stable internet connection for API-based experiments
 
 2. **Execution Time Expectations**
