@@ -19,4 +19,13 @@ This can be done for example for 2 reports, by running:
 
 In case there is no integer given the script will revert to running each LACNE version with all 50 of the reports.
 
+# Attention:
+
+Even though Llama, Gemma are open source the users are required to sign the community license agreement in HuggingFace.
+The agreement for each model can be found on the corresponding HuggingFace page:
+https://huggingface.co/meta-llama/Llama-3.3-70B-Instruct
+https://huggingface.co/google/gemma-3-27b-it
+
+After signing the agreement
+
 In case this is not possible for the reviewer(s), we provide evaluation of the results we got running this experiment in claim 8.

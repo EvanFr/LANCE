@@ -39,7 +39,7 @@ fi
 echo "Creating conda environment for UI (claim 2)..."
 eval "$(conda shell.bash hook)"
 
-conda env create -n UI_env python=3.12 -y
+conda create -n UI_env python=3.12 -y
 conda activate UI_env
 pip install -r ./artifact/UI/requirements.txt
 conda deactivate
@@ -58,6 +58,16 @@ echo "Creating conda environment for LANCE-OpenSource (claim 6)..."
 
 conda env create -f ./artifact/LANCE_sota_LLMs/transformers_env.yml  -y
 echo "Conda environment for LANCE-OpenSource created. [4/6]"
+
+# Create LANCE-Gemma conda environment
+echo "Creating conda environment for LANCE-Gemma (claim 6)..."
+
+conda env create -n LANCE-Gemma -f ./artifact/LANCE_sota_LLMs/transformers_env.yml  -y
+conda activate LANCE-Gemma
+pip uninstall transformers -y
+pip install git+https://github.com/huggingface/transformers@v4.49.0-Gemma-3
+echo "Conda environment for LANCE-Gemma created. [4/6]"
+
 
 # Create LANCE-Gemini conda environment
 echo "Creating conda environment for LANCE-Gemini (claim 6)..."
