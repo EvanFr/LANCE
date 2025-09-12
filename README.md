@@ -54,13 +54,29 @@ This repository contains the artifacts and evaluation framework for the research
 
 ### Installation
 
-1. **Clone the repository and navigate to the directory:**
+1. **Clone the repository**
+```bash
+git clone https://github.com/EvanFr/LANCE.git
+```
+
+**ATENTION**[!WARNING]
+In some cases due to limited budget on github lfs the .tgz files in the artifact directory will not be downloaded with the git clone.
+
+Please use the following link to download them from OneDrive:
+https://gtvault-my.sharepoint.com/:f:/g/personal/efroudakis3_gatech_edu/EjTHXFyANtNPvIWVYAptoHIBSiVEkeB9bcz1a56sBPkoAQ?e=WwdzUG
+
+Using the following as password:
+IoC-ACSAC
+
+Unzip the artifact folder and use it to replace the one downloaded by the git clone.
+
+2. **Navigate to the directory:**
 
 ```bash
 cd LANCE
 ```
 
-2. **Run the installation script:**
+3. **Run the installation script:**
 
 ```bash
 bash install.sh
@@ -75,6 +91,8 @@ This script will:
   - `open_LLMs`: For open-source LLMs
   - `Gemini`: For LANCE with Gemini
   - `IoC_Miner`: For the IoC extraction model
+
+Approximate running time ~15 minutes
 
 ### Basic Usage
 

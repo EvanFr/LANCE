@@ -66,8 +66,8 @@ echo "[4/7] Conda environment for LANCE-OpenSource created."
 # Create LANCE-Gemma conda environment
 echo "Creating conda environment for LANCE-Gemma (claim 6)..."
 
-conda env create -n LANCE-Gemma -f ./artifact/LANCE_sota_LLMs/transformers_env.yml  -y
-conda activate LANCE-Gemma
+conda env create -n LANCE_Gemma -f ./artifact/LANCE_sota_LLMs/transformers_env.yml  -y
+conda activate LANCE_Gemma
 pip uninstall transformers -y
 pip install git+https://github.com/huggingface/transformers@v4.49.0-Gemma-3
 echo "[5/7] Conda environment for LANCE-Gemma created."
