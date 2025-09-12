@@ -1,0 +1,428 @@
+.
+├── README.txt
+├── artifact
+│   ├── 500
+│   │   ├── GPT_IoCs
+│   │   │   ├── ReportNameA.csv
+│   │   │   ├── CVE
+│   │   │   │   └── ReportNameA.txt
+│   │   │   ├── HASH
+│   │   │   │   └── ReportNameA.txt
+│   │   │   ├── IP
+│   │   │   │   └── ReportNameA.txt
+│   │   │   ├── URL
+│   │   │   │   └── ReportNameA.txt
+│   │   │   ├── domain
+│   │   │   │   └── ReportNameA.txt
+│   │   └── output_PDFs
+│   │       └── ReportNameA_Highlighter.pdf
+│   ├── 500.tgz
+│   ├── AnalystsData
+│   │   ├── Analyst1
+│   │   │   ├── part1
+│   │   │   │   └── ReportA.pdf_annotations.json
+│   │   │   └── part2
+│   │   │       └── ReportA.pdf_annotations.json
+│   │   ├── Analyst2
+│   │   │   ├── part1
+│   │   │   │   └── ReportA.pdf_annotations.json
+│   │   │   └── part2
+│   │   │       └── ReportA.pdf_annotations.json
+│   │   ├── Analyst3
+│   │   │   ├── part1
+│   │   │   │   └── ReportA.pdf_annotations.json
+│   │   │   └── part2
+│   │   │       └── ReportA.pdf_annotations.json
+│   │   ├── Analyst4
+│   │   │   ├── part1
+│   │   │   │   └── ReportA.pdf_annotations.json
+│   │   │   └── part2
+│   │   │       └── ReportA.pdf_annotations.json
+│   │   ├── Analyst5
+│   │   │   ├── part1
+│   │   │   │   └── ReportA.pdf_annotations.json
+│   │   │   └── part2
+│   │   │       └── ReportA.pdf_annotations.json
+│   │   ├── AnalystS
+│   │   │   ├── part1
+│   │   │   │   └── ReportA.pdf_annotations.json
+│   │   │   └── part2
+│   │   │       └── ReportA.pdf_annotations.json
+│   │   ├── Analysts_eval.py
+│   │   ├── GAP_results.json
+│   │   ├── GT.json
+│   │   ├── UI_speed_analysis.py
+│   │   ├── part1Final.json
+│   │   └── part2Final.json
+│   ├── AnalystsData.tgz
+│   ├── Comparison
+│   │   ├── AlienVault
+│   │   │   ├── AV_FN.txt
+│   │   │   ├── AV_FP.txt
+│   │   │   ├── AV_TP.txt
+│   │   │   └── Results_AlienVault.json
+│   │   ├── GoodFATR_method
+│   │   │   ├── GFM_FN.txt
+│   │   │   ├── GFM_FP.txt
+│   │   │   ├── GFM_TP.txt
+│   │   │   └── ResultsIoC_searcher_cleared.json
+│   │   ├── PlainGPT
+│   │   │   ├── IoCs
+│   │   │   │   ├── CVE
+│   │   │   │   │   └── ReportNameA.txt
+│   │   │   │   ├── Domain
+│   │   │   │   │   └── ReportNameA.txt
+│   │   │   │   ├── Hash
+│   │   │   │   │   └── ReportNameA.txt
+│   │   │   │   ├── IP
+│   │   │   │   │   └── ReportNameA.txt
+│   │   │   │   └── URL
+│   │   │   │       └── ReportNameA.txt
+│   │   │   └── stats
+│   │   │       ├── GPT_FN.txt
+│   │   │       ├── GPT_FP.txt
+│   │   │       ├── GPT_TP.txt
+│   │   │       └── Results.json
+│   │   ├── VT
+│   │   │   ├── VT_th1_FN.txt
+│   │   │   ├── VT_th1_FP.txt
+│   │   │   ├── VT_th1_TP.txt
+│   │   │   ├── VT_th1_results.json
+│   │   │   ├── VT_th5_FN.txt
+│   │   │   ├── VT_th5_FP.txt
+│   │   │   ├── VT_th5_TP.txt
+│   │   │   └── VT_th5_results.json
+│   │   └── prominent_methods.py
+│   ├── Comparison.tgz
+│   ├── GT.json
+│   ├── GT_analysis
+│   │   ├── Analysis.py
+│   │   └── GT.json
+│   ├── GT_analysis.tgz
+│   ├── Generalization
+│   │   ├── GT.json
+│   │   ├── Gemini_iocs
+│   │   │   ├── CVE
+│   │   │   │   └── ReportNameA.txt
+│   │   │   ├── HASH
+│   │   │   │   └── ReportNameA.txt
+│   │   │   ├── IP
+│   │   │   │   └── ReportNameA.txt
+│   │   │   ├── URL
+│   │   │   │   └── ReportNameA.txt
+│   │   │   ├── domain
+│   │   │   │   └── ReportNameA.txt
+│   │   │   └── ReportNameA.csv
+│   │   ├── Gemma_IoCs
+│   │   │   ├── CVE
+│   │   │   │   └── ReportNameA.txt
+│   │   │   ├── HASH
+│   │   │   │   └── ReportNameA.txt
+│   │   │   ├── IP
+│   │   │   │   └── ReportNameA.txt
+│   │   │   ├── URL
+│   │   │   │   └── ReportNameA.txt
+│   │   │   ├── domain
+│   │   │   │   └── ReportNameA.txt
+│   │   │   └── ReportNameA.csv
+│   │   ├── LLMs.py
+│   │   ├── Llama_IoCs
+│   │   │   ├── CVE
+│   │   │   │   └── ReportNameA.txt
+│   │   │   ├── HASH
+│   │   │   │   └── ReportNameA.txt
+│   │   │   ├── IP
+│   │   │   │   └── ReportNameA.txt
+│   │   │   ├── URL
+│   │   │   │   └── ReportNameA.txt
+│   │   │   ├── domain
+│   │   │   │   └── ReportNameA.txt
+│   │   │   └── ReportNameA.csv
+│   │   └── Nvidia_Llama_IoCs
+│   │       ├── CVE
+│   │       │   └── ReportNameA.txt
+│   │       ├── HASH
+│   │       │   └── ReportNameA.txt
+│   │       ├── IP
+│   │       │   └── ReportNameA.txt
+│   │       ├── URL
+│   │       │   └── ReportNameA.txt
+│   │       ├── domain
+│   │       │   └── ReportNameA.txt
+│   │       └── ReportNameA.csv
+│   ├── Generalization.tgz
+│   ├── IoCMiner
+│   │   ├── CTI_classifier.py
+│   │   ├── CTI_expert_finder.py
+│   │   ├── LICENSE
+│   │   ├── README.md
+│   │   ├── dataset
+│   │   │   ├── dataset50GPT_processed.csv
+│   │   │   ├── dataset50VT1_processed.csv
+│   │   │   ├── dataset50VT5_processed.csv
+│   │   │   └── datasetTest50GT_processed.csv
+│   │   ├── environment.yaml
+│   │   ├── main.py
+│   │   └── utility.py
+│   ├── IoCMiner.tgz
+│   ├── LANCE
+│   │   ├── GPT_IoCs
+│   │   │   ├── CVE
+│   │   │   │   └── ReportNameA.txt
+│   │   │   ├── HASH
+│   │   │   │   └── ReportNameA.txt
+│   │   │   ├── IP
+│   │   │   │   └── ReportNameA.txt
+│   │   │   ├── URL
+│   │   │   │   └── ReportNameA.txt
+│   │   │   ├── ReportNameA.csv
+│   │   │   └── domain
+│   │   │       └── ReportNameA.txt
+│   │   ├── IoC_searcher_IoC_dict
+│   │   │   └── ReportNameA.json
+│   │   ├── IoC_searcher_IoCs
+│   │   │   └── ReportNameA.csv
+│   │   ├── LANCE.py
+│   │   ├── ReportsJSON
+│   │   │   └── ReportNameA.json
+│   │   ├── ReportsPDF
+│   │   │   └── ReportNameA.pdf
+│   │   ├── ReportsTXT
+│   │   │   └── ReportNameA.txt
+│   │   ├── environment.yaml
+│   │   ├── logs.txt
+│   │   ├── output_PDFs
+│   │   │   └── ReportNameA_Highlighter.pdf
+│   │   └── prompts.txt
+│   ├── LANCE.tgz
+│   ├── LANCE_sota_LLMs
+│   │   ├── Gemini
+│   │   │   ├── Gem_iocs_copy
+│   │   │   │   ├── CVE
+│   │   │   │   │   └── ReportNameA.txt
+│   │   │   │   ├── HASH
+│   │   │   │   │   └── ReportNameA.txt
+│   │   │   │   ├── IP
+│   │   │   │   │   └── ReportNameA.txt
+│   │   │   │   ├── URL
+│   │   │   │   │   └── ReportNameA.txt
+│   │   │   │   ├── domain
+│   │   │   │   │   └── ReportNameA.txt
+│   │   │   │   └── ReportNameA.csv
+│   │   │   ├── IoC_searcher_IoC_dict
+│   │   │   │   └── ReportNameA.json
+│   │   │   ├── IoC_searcher_IoCs
+│   │   │   │   └── ReportNameA.csv
+│   │   │   ├── ReportsJSON
+│   │   │   │   └── ReportNameA.json
+│   │   │   ├── ReportsPDF
+│   │   │   │   └── ReportNameA.pdf
+│   │   │   ├── ReportsTXT
+│   │   │   │   └── ReportNameA.txt
+│   │   │   ├── environment.yaml
+│   │   │   ├── extractor.py
+│   │   │   ├── logs.txt
+│   │   │   ├── output_PDFs
+│   │   │   │   └── ReportNameA_Highlighter.pdf
+│   │   │   └── prompts.txt
+│   │   ├── Llama
+│   │   │   ├── IoC_searcher_IoC_dict
+│   │   │   │   └── ReportNameA.json
+│   │   │   ├── IoC_searcher_IoCs
+│   │   │   │   └── ReportNameA.csv
+│   │   │   ├── Llama_IoCs_copy
+│   │   │   │   ├── CVE
+│   │   │   │   │   └── ReportNameA.txt
+│   │   │   │   ├── HASH
+│   │   │   │   │   └── ReportNameA.txt
+│   │   │   │   ├── IP
+│   │   │   │   │   └── ReportNameA.txt
+│   │   │   │   ├── URL
+│   │   │   │   │   └── ReportNameA.txt
+│   │   │   │   ├── domain
+│   │   │   │   │   └── ReportNameA.txt
+│   │   │   │   └── ReportNameA.csv
+│   │   │   ├── ReportsJSON
+│   │   │   │   └── ReportNameA.json
+│   │   │   ├── ReportsPDF
+│   │   │   │   └── ReportNameA.pdf
+│   │   │   ├── ReportsTXT
+│   │   │   │   └── ReportNameA.txt
+│   │   │   ├── extractor.py
+│   │   │   ├── logs.txt
+│   │   │   ├── output_PDFs
+│   │   │   │   └── ReportNameA.pdf
+│   │   │   ├── prompts.txt
+│   │   │   └── reports.txt
+│   │   ├── cudaTest.py
+│   │   ├── gemma
+│   │   │   ├── Gemma_IoCs
+│   │   │   │   ├── CVE
+│   │   │   │   │   └── ReportNameA.txt
+│   │   │   │   ├── HASH
+│   │   │   │   │   └── ReportNameA.txt
+│   │   │   │   ├── IP
+│   │   │   │   │   └── ReportNameA.txt
+│   │   │   │   ├── URL
+│   │   │   │   │   └── ReportNameA.txt
+│   │   │   │   ├── domain
+│   │   │   │   │   └── ReportNameA.txt
+│   │   │   │   └── ReportNameA.csv
+│   │   │   ├── Gemma_IoCs_copy
+│   │   │   │   ├── CVE
+│   │   │   │   │   └── ReportNameA.txt
+│   │   │   │   ├── HASH
+│   │   │   │   │   └── ReportNameA.txt
+│   │   │   │   ├── IP
+│   │   │   │   │   └── ReportNameA.txt
+│   │   │   │   ├── URL
+│   │   │   │   │   └── ReportNameA.txt
+│   │   │   │   ├── domain
+│   │   │   │   │   └── ReportNameA.txt
+│   │   │   │   └── ReportNameA.csv
+│   │   │   ├── IoC_searcher_IoC_dict
+│   │   │   │   └── ReportNameA.json
+│   │   │   ├── IoC_searcher_IoCs
+│   │   │   │   └── ReportNameA.csv
+│   │   │   ├── ReportsJSON
+│   │   │   │   └── ReportNameA.json
+│   │   │   ├── ReportsPDF
+│   │   │   │   └── ReportNameA.pdf
+│   │   │   ├── ReportsTXT
+│   │   │   │   └── ReportNameA.txt
+│   │   │   ├── extractor.py
+│   │   │   ├── gemmaTester.py
+│   │   │   ├── logs.txt
+│   │   │   ├── output_PDFs
+│   │   │   │   └── ReportNameA_Highlighter.pdf
+│   │   │   ├── prompts.txt
+│   │   │   └── reports.txt
+│   │   ├── lama4Test.py
+│   │   ├── lamaTest.py
+│   │   ├── nvidiaLama
+│   │   │   ├── IoC_searcher_IoC_dict
+│   │   │   │   └── ReportNameA.json
+│   │   │   ├── IoC_searcher_IoCs
+│   │   │   │   └── ReportNameA.csv
+│   │   │   ├── Llama_IoCs
+│   │   │   │   ├── CVE
+│   │   │   │   │   └── ReportNameA.txt
+│   │   │   │   ├── HASH
+│   │   │   │   │   └── ReportNameA.txt
+│   │   │   │   ├── IP
+│   │   │   │   │   └── ReportNameA.txt
+│   │   │   │   └── URL
+│   │   │   │       └── ReportNameA.txt
+│   │   │   ├── Llama_IoCs_copy
+│   │   │   │   ├── CVE
+│   │   │   │   │   └── ReportNameA.txt
+│   │   │   │   ├── HASH
+│   │   │   │   │   └── ReportNameA.txt
+│   │   │   │   ├── IP
+│   │   │   │   │   └── ReportNameA.txt
+│   │   │   │   ├── URL
+│   │   │   │   │   └── ReportNameA.txt
+│   │   │   │   ├── domain
+│   │   │   │   │   └── ReportNameA.txt
+│   │   │   │   └── ReportNameA.csv
+│   │   │   ├── ReportsJSON
+│   │   │   │   └── ReportNameA.json
+│   │   │   ├── ReportsPDF
+│   │   │   │   └── ReportNameA.pdf
+│   │   │   ├── ReportsTXT
+│   │   │   │   └── ReportNameA.txt
+│   │   │   ├── extractor.py
+│   │   │   ├── logs.txt
+│   │   │   ├── output_PDFs
+│   │   │   │   └── ReportNameA.pdf
+│   │   │   ├── prompts.txt
+│   │   │   └── reports.txt
+│   │   └── transformers_env.yml
+│   ├── LANCE_sota_LLMs.tgz
+│   ├── UI
+│   │   ├── README.md
+│   │   ├── UI_tutorial_1.mov
+│   │   ├── UI_tutorial_2.mov
+│   │   ├── pyWeb1
+│   │   │   ├── app.py
+│   │   │   ├── templates
+│   │   │   │   └── index.html
+│   │   │   └── uploads
+│   │   │       ├── Report10.pdf
+│   │   │       ├── Report16.pdf
+│   │   │       ├── Report20.pdf
+│   │   │       ├── Report28.pdf
+│   │   │       ├── Report30.pdf
+│   │   │       ├── Report36.pdf
+│   │   │       ├── Report4.pdf
+│   │   │       ├── Report40.pdf
+│   │   │       ├── Report48.pdf
+│   │   │       ├── Report50.pdf
+│   │   │       └── Report8.pdf
+│   │   ├── pyWeb2
+│   │   │   ├── app.py
+│   │   │   ├── templates
+│   │   │   │   └── index.html
+│   │   │   └── uploads
+│   │   │       ├── Report13.pdf
+│   │   │       └── Report35.pdf
+│   │   └── requirements.txt
+│   └── UI.tgz
+├── claims
+│   ├── claim1
+│   │   ├── claim.txt
+│   │   ├── expected
+│   │   │   ├── README.txt
+│   │   │   └── expected_output.txt
+│   │   └── run.sh
+│   ├── claim2
+│   │   ├── claim.txt
+│   │   ├── expected
+│   │   │   └── README.txt
+│   │   └── run.sh
+│   ├── claim3
+│   │   ├── claim.txt
+│   │   ├── expected
+│   │   │   ├── README.txt
+│   │   │   └── expected_output.txt
+│   │   └── run.sh
+│   ├── claim4
+│   │   ├── claim.txt
+│   │   ├── expected
+│   │   │   ├── README.txt
+│   │   │   └── expected_output.txt
+│   │   └── run.sh
+│   ├── claim5
+│   │   ├── claim.txt
+│   │   ├── expected
+│   │   │   └── README.txt
+│   │   └── run.sh
+│   ├── claim6
+│   │   ├── claim.txt
+│   │   ├── expected
+│   │   │   └── README.txt
+│   │   └── run.sh
+│   ├── claim7
+│   │   ├── claim.txt
+│   │   ├── expected
+│   │   │   ├── README.txt
+│   │   │   └── expected_output.txt
+│   │   └── run.sh
+│   ├── claim8
+│   │   ├── claim.txt
+│   │   ├── expected
+│   │   │   ├── README.txt
+│   │   │   └── expected_output.txt
+│   │   └── run.sh
+│   └── claim9
+│       ├── claim.txt
+│       ├── expected
+│       │   └── README.txt
+│       └── run.sh
+├── infrastructure
+├── install.sh
+├── license.txt
+├── tree.txt
+└── use.txt
+
+173 directories, 10718 files

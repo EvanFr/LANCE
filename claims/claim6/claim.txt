@@ -12,4 +12,11 @@ The first three models (Llama, Gemma, and Nemotron) are open source and the infe
 For Gemini the reviewer(s) will need access to the corresponding API services provided by Google.
 Before running run.sh make sure you added your API key in the corresponding field at the top of the script.
 
+There is the to option run each LACNE version with a limited number of reports. This way the reviewer(s) can verify the functionality of LANCE without having long wait times.
+This can be done for example for 2 reports, by running:
+
+./run.sh 2
+
+In case there is no integer given the script will revert to running each LACNE version with all 50 of the reports.
+
 In case this is not possible for the reviewer(s), we provide evaluation of the results we got running this experiment in claim 8.

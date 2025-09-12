@@ -1,0 +1,114 @@
+# ARTIFACT EVALUATION: INTENDED USE AND LIMITATIONS
+
+## INTENDED USE FOR REVIEWERS
+
+### Purpose of This Artifact
+
+This artifact package is designed to enable **comprehensive evaluation and reproducibility** of the research claims presented in our paper "Revealing the True Indicators: Understanding and Improving IoC Extraction From Threat Reports". 
+
+### Evaluation Objectives
+
+1. **Claim Verification**
+   - Validate the 9 research claims through independent execution
+   - Reproduce key results reported in the paper
+   - Verify dataset statistics and model performance metrics
+   - Confirm the effectiveness of human-AI collaboration approaches
+
+2. **Reproducibility Assessment**
+   - Test the LANCE framework with available LLM APIs
+   - Evaluate the user interface functionality and usability
+   - Verify computational workflows and data processing pipelines
+   - Assess the quality and structure of the PRISM dataset
+
+3. **Comparative Analysis**
+   - Reproduce comparisons with baseline methods (GoodFATR, VirusTotal, AlienVault)
+   - Validate multi-LLM generalization results
+   - Confirm analyst performance improvements with GAP mode
+   - Verify IoC extraction model training improvements
+
+4. **Technical Validation**
+   - Test installation procedures and environment setup
+   - Verify code functionality and error handling
+   - Assess data format consistency and documentation quality
+   - Evaluate artifact organization and accessibility
+
+### Reviewer Workflow
+
+**Phase 1: Setup and Installation**
+- Execute `install.sh` to set up all required environments
+- Verify successful creation of conda environments
+- Test basic functionality of key components
+
+**Phase 2: Core Claims Evaluation**
+- Execute `claims/claim1/run.sh` through `claims/claim9/run.sh`
+- Compare outputs with expected results in `expected/` directories
+- Document any discrepancies or issues encountered
+
+**Phase 3: Interactive Components**
+- Test the UI interface (claims 2)
+- Evaluate the analyst workflow and timing mechanisms
+- Assess the quality of LANCE predictions and justifications
+
+
+## LIMITATIONS FOR ARTIFACT EVALUATION
+
+### API Dependencies and Alternatives
+
+1. **Required API Access**
+   - **Claim 5**: OpenAI GPT-4o API required for full LANCE evaluation
+   - **Claims 6 & 8**: Google Gemini API needed for multi-LLM comparison
+   - **Alternative**: Pre-computed results provided in artifact directories if API access unavailable
+
+2. **API Key Configuration**
+   - Reviewers must add personal API keys to `run.sh` scripts before execution
+   - Keys should replace "your_api_key_here" placeholders
+   - Scripts will fail safely if keys are not properly configured
+
+### Computational Requirements
+
+1. **System Requirements**
+   - **Minimum**: 8GB RAM, modern multi-core CPU
+   - **Recommended**: 16GB+ RAM, modern multi-core CPU
+   - **GPU**: Optional but recommended for Claims 6 (local LLM processing)
+   - **Network**: Stable internet connection for API-based experiments
+
+2. **Execution Time Expectations**
+   - **Quick Claims** (1, 3, 4, 7, 8): < 5 minutes each
+   - **Medium Claims** (2, 9): 10-30 minutes (UI testing)
+   - **Long Claims** (5, 6, 8): 1-20 hours (depending on API availability and local resources)
+
+
+## Expected Evaluation Outcomes
+
+1. **Reproducible Results**
+   - Dataset statistics (Claim 1, 3, 4, 7): Exact match expected
+   - UI functionality (Claim 2): Full functionality demonstration
+   - Performance metrics (Claims 5, 6, 8, 9): Close approximation within confidence intervals
+
+2. **Variable Results (API-dependent)**
+   - LLM outputs may vary slightly due to API updates or randomness
+   - Performance scores may fluctuate within ±5% range
+   - Timing results may vary based on network latency and system performance
+
+3. **Known Issues and Workarounds**
+   - Some conda environments may require manual dependency resolution
+   - Large model downloads may timeout on slower connections
+   - UI testing requires manual interaction and cannot be fully automated
+
+## Reviewer Considerations
+
+1. **Time Investment**
+   - **Minimum evaluation**: 1-2 hours (basic claim verification)
+   - **Comprehensive evaluation**: 3-6 hours (full artifact exploration)
+   - **Deep evaluation**: 6+ hours (detailed analysis and comparison)
+
+2. **Technical Expertise Assumptions**
+   - Familiarity with conda/Python environment management
+   - Basic understanding of cybersecurity concepts and IoC types
+   - Experience with web interfaces and data analysis tools
+   - Optional: LLM/API experience for advanced troubleshooting
+
+3. **Documentation Dependencies**
+   - README.md provides comprehensive setup and execution guidance
+   - Individual claim directories contain specific evaluation instructions
+   - Expected outputs provided in `expected/` directories for comparison
