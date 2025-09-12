@@ -44,6 +44,9 @@ python extractor.py
 
 ## Gemma
 
+conda deactivate
+conda activate LANCE-Gemma
+
 cd ../gemma/
 
 python extractor.py

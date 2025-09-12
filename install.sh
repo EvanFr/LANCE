@@ -16,9 +16,13 @@ for file in "$TARGET_DIR"*.tgz; do
 
     echo "Extracting: $file"
     tar -xvzf "$file" -C "$TARGET_DIR"
+
+    # Remove any macOS metadata files like ._Report10.pdf etc.
+    find "$TARGET_DIR" -type f -name '._*' -delete
 done
 
-echo "Unzipping completed. [1/6]"
+
+echo "[1/7] Unzipping completed."
 
 # minor fixes
 cp ./artifact/LANCE_sota_LLMs/Llama/reports.txt ./artifact/LANCE_sota_LLMs/Gemini/reports.txt
@@ -44,20 +48,20 @@ conda activate UI_env
 pip install -r ./artifact/UI/requirements.txt
 conda deactivate
 
-echo "Conda environment for UI created. [2/6]"
+echo "[2/7] Conda environment for UI created."
 
 # Create LANCE-GPT conda environment
 echo "Creating conda environment for LANCE-GPT (claim 5)..."
 
 conda env create -f ./artifact/LANCE/environment.yaml -y
 
-echo "Conda environment for LANCE-GPT created. [3/6]"
+echo "[3/7] Conda environment for LANCE-GPT created."
 
 # Create LANCE-OpenSource conda environment
 echo "Creating conda environment for LANCE-OpenSource (claim 6)..."
 
 conda env create -f ./artifact/LANCE_sota_LLMs/transformers_env.yml  -y
-echo "Conda environment for LANCE-OpenSource created. [4/6]"
+echo "[4/7] Conda environment for LANCE-OpenSource created."
 
 # Create LANCE-Gemma conda environment
 echo "Creating conda environment for LANCE-Gemma (claim 6)..."
@@ -66,20 +70,20 @@ conda env create -n LANCE-Gemma -f ./artifact/LANCE_sota_LLMs/transformers_env.y
 conda activate LANCE-Gemma
 pip uninstall transformers -y
 pip install git+https://github.com/huggingface/transformers@v4.49.0-Gemma-3
-echo "Conda environment for LANCE-Gemma created. [4/6]"
+echo "[5/7] Conda environment for LANCE-Gemma created."
 
 
 # Create LANCE-Gemini conda environment
 echo "Creating conda environment for LANCE-Gemini (claim 6)..."
 
 conda env create -f ./artifact/LANCE_sota_LLMs/Gemini/environment.yaml -y
-echo "Conda environment for LANCE-Gemini created. [5/6]"
+echo "[6/7] Conda environment for LANCE-Gemini created."
 
 # Create IoC_Miner conda environment
 echo "Creating conda environment for IoC_Miner (claim 9)..."
 
 conda env create -f ./artifact/IoCMiner/environment.yaml -y
 
-echo "Conda environment for IoC_Miner created. [6/6]"
+echo "[7/7] Conda environment for IoC_Miner created."
 
 echo "Installation completed successfully."
