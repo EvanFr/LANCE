@@ -20,13 +20,6 @@ fi
 
 export rep_num
 
-# assert that the API key has been replaced
-if [ "$Gemini_API_KEY" == "your_api_key_here" ]; then
-  echo "Please replace 'your_api_key_here' with your actual Gemini API key in run.sh"
-  exit 1
-fi
-
-export Gemini_API_KEY
 
 
 # navigate to the LANCE directory
@@ -56,6 +49,15 @@ cd ../gemma/
 python extractor.py
 
 ## Gemini
+
+
+# assert that the API key has been replaced
+if [ "$Gemini_API_KEY" == "your_api_key_here" ]; then
+  echo "Please replace 'your_api_key_here' with your actual Gemini API key in run.sh"
+  exit 1
+fi
+
+export Gemini_API_KEY
 
 conda deactivate
 conda activate Gemini
