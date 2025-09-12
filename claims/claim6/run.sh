@@ -6,8 +6,8 @@ Gemini_API_KEY="your_api_key_here"
 
 # Get the number of reports from the command line argument, default to all 50 if not provided
 if [ -z "$1" ]; then
-    # No argument → set to -1
-    rep_num=-1
+    # No argument → set to 50
+    rep_num=50
 else
     # Check if argument is a positive integer
     if [[ "$1" =~ ^[0-9]+$ ]]; then
