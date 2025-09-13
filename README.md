@@ -52,7 +52,15 @@ This repository contains the artifacts and evaluation framework for the research
 - **API Keys** (optional): OpenAI API key for LANCE-GPT, Google API key for Gemini
 - **System Requirements**: Moderate CPU usage, GPU optional for local LLM inference
 
-### Installation
+### Notebook
+
+LANCE_paper_artifacts.ipynb contains all the necessary steps for a first look of the artifacts and claims.
+
+The cells are executed so you can see the output of the claims.
+
+By following the instructions and running the cells yourself, you can see the output of the claims.
+
+### Local Installation
 
 1. **Clone the repository**
 ```bash
@@ -60,7 +68,7 @@ git clone https://github.com/EvanFr/LANCE.git
 ```
 
 **ATENTION**[!WARNING]
-In some cases due to limited budget on github lfs the .tgz files in the artifact directory will not be downloaded with the git clone.
+Due to limited budget on github lfs, the .tgz files in the artifact directory will not be downloaded with the git clone.
 
 Please use the following link to download them from OneDrive:
 https://gtvault-my.sharepoint.com/:f:/g/personal/efroudakis3_gatech_edu/EjTHXFyANtNPvIWVYAptoHIBSiVEkeB9bcz1a56sBPkoAQ?e=WwdzUG
