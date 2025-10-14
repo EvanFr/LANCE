@@ -39,6 +39,29 @@ else
     exit 1
 fi
 
+# Check if conda is properly initialized, if not initialize it
+if ! conda info &> /dev/null; then
+    echo "Conda is not properly initialized. Running conda init..."
+    conda init
+    echo "Conda has been initialized. Sourcing conda configuration..."
+    
+    # Source the conda configuration for the current shell
+    if [ -f ~/.zshrc ]; then
+        source ~/.zshrc
+    elif [ -f ~/.bashrc ]; then
+        source ~/.bashrc
+    fi
+    
+    # Verify conda is now working
+    if ! conda info &> /dev/null; then
+        echo "Failed to initialize conda properly. Please restart your shell and run this script again."
+        echo "You can do this by running: source ~/.zshrc (or source ~/.bashrc if using bash)"
+        exit 1
+    fi
+    
+    echo "Conda initialization successful, continuing with installation..."
+fi
+
 # Create UI conda environment
 echo "Creating conda environment for UI (claim 2)..."
 eval "$(conda shell.bash hook)"
