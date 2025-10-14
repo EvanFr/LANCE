@@ -67,8 +67,8 @@ By following the instructions and running the cells yourself, you can see the ou
 git clone https://github.com/EvanFr/LANCE.git
 ```
 
-**ATENTION**[!WARNING]
-Due to limited budget on github lfs, the .tgz files in the artifact directory will not be downloaded with the git clone.
+**ATENTION** ⚠️
+Due to limited budget on GitHub LFS, the .tgz files in the artifact directory will not be downloaded with the git clone.
 
 Please use the following link to download them from OneDrive:
 https://gtvault-my.sharepoint.com/:f:/g/personal/efroudakis3_gatech_edu/EjTHXFyANtNPvIWVYAptoHIBSiVEkeB9bcz1a56sBPkoAQ?e=WwdzUG
