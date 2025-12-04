@@ -1,0 +1,67 @@
+{
+    "id": "b0ef203d-7e9d-40bf-ad1b-f84bffe88a2f",
+    "created_at": "2023-06-05T02:06:40.985651Z",
+    "updated_at": "2024-11-22T02:03:35.537837Z",
+    "deleted_at": null,
+    "sha1_hash": "4a1900ea23505d94a251adae3bba9a8c5a894cb3",
+    "title": "2023-05-26 - Kraken - The Deep Sea Lurker Part 2",
+    "authors": "",
+    "file_creation_date": "2023-06-04T13:02:35Z",
+    "file_modification_date": "2023-06-04T13:02:35Z",
+    "file_size": 1823883,
+    "plain_text": "Kraken - The Deep Sea Lurker Part 2\n0xtoxin.github.io/threat hunting/KrakenKeylogger-pt2/\nMay 26, 2023\n\nPart 2 of analyzing the KrakenKeylogger Malware\n5 minute read\n\n0xToxin\nThreat Analyst & IR team leader - Malware Analysis - Blue Team\n\nIntro\nIn the second part of analyzing the \u201cKrakenKeylogger\u201d, I will be diving into some proactive\n\u201cthreat hunting\u201d steps I\u2019ve done during my research about the Kraken.\nIf you haven\u2019t already read the first part of analyzing the Kraken, be sure to check it out here\nWith that saying let\u2019s begin!\n\nWhat we have?\nLet\u2019s start with what we currently have and how can we pivot with it:\n\n1/11\n\nC2: thereccorp.com\nPayload fetching domain: masherofmasters.cyou\nBinary Name: KrakenStub\nThe hunting will be splitted into 4 part:\n1. thereccorp.com analysis\n2. masherofmasters.cyou analysis\n3. UnpackMe Yara Hunt\n4. OSINT research\n\nthereccorp.com Analysis\nWe start off with our final C2 domain thereccorp.com, searching the domain in VirusTotal\nwill respond us with a solid 0/87 vendors detection:\n\ngoing to the relations tab and looking at the Communicating Files files we can see 22 files\nwhich all were flagged as malicious:\n\n2/11\n\nall files are pretty recent (oldest one dated to 7th of May 23), this in fact helps us to\nunderstand that the campaign is pretty new and keeps being distributed.\nSome files were already analyzed by various sandboxes and this helped me a lot by\ndownloading the file from those sandboxes reports (most Sandboxes I know allow\ndownloading the examined sample). Let\u2019s have a look at couple samples that were actually\nflagged falsely\n\nRareCommodityHelper.exe\nSha256: 8a6bebf08f6c223ed9821ee3b80e420060c66770402687f5c98555f9b0cd02a3\nVirusTotal\nMalwareBazaar\nLooking at the Vendor Threat Intelligence tab in the MalwareBazaar report we can see\nthat 3 different family associated with the sample.\n\nI\u2019ve opened the report of JoeSandBox and simply searched for the string kraken and\nsurprisingly look what popped up:\n\nWhy would AgentTesla malware will have KrakenStub named file during it\u2019s execution?\n\n3/11\n\nI took a look also UnpackMe report.\nLooking at the Unpacked binary that was flagged as masslogger we can see the\nProductName, FileDescription, OriginalFilename and InternalName share the same\nsuspicious string we\u2019re looking for: KrakenStub\n\nRareCommodityHelper.exe\nSha256: 413ec94d35627af97c57c6482630e6b2bb299eebf164e187ea7df0a0eb80ecc6\nVirusTotal\nMalwareBazaar\nGoing with the same approach as before, I took a look at the report of the different vendors\nunder MalwareBazaar page and found again 3 different families:\n\n4/11\n\nI once again checked if our suspicious Kraken string can be found either in JoeSandbox or\nUnpackMe reports and guess what?\n\n5/11\n\nKraken was found in both of them once again.\nAt this point I felt comfortable with my findings from the C2 IOC.\nLet\u2019s move to the second domain we have.\n\nmasherofmasters.cyou Analysis\nTypically when I encounter a domain I will investigate it in 3 main sources:\n1. VirusTotal\n2. URLscan\n3. URLhaus\nthose 3 are my go to sources for inital domain information gathering.\n\nVirusTotal\nLooking at the domain on VirusTotal can give us a lot of data, such as DNS records, JARM\nfingerprints, SSL Certs, WhoIS lookup and much more, but the interesting part that I look\nwhen doing a proactive hunt is the Relations tab , this tab can tell us which IP\u2019s this domain\nwas assigned to, if it has subdomains and which associated files this domain had\nconnection with:\n6/11\n\nBased on the given list, we can see that 5 files were .lnk files, which correlated with our\nexecution flow explained in part 1. (from here you can take the files and see the execution\nflow when they\u2019re detonated and compare to your findings)\n\nURLscan\nUnfortunetlly at the time of investigation the domain was already terminated and no previous\nscans were made on URLscan so I couldn\u2019t find nothing about it here\u2026\n\nURLhaus\nWhen I searched the domain in URLhaus I found about 12 hits:\n\nSome of the files are being flagged as MassLogger others were flagged as SnakeKeylogger\nand also AgentTesla , I investigated all the files and actually the ones that were marked as\nAgentTesla were indeed that malware but the samples which were flagged as MassLogger\nand SnakeKeylogger were actually our beloved Kraken\u2026\n\nUnpackMe Yara Hunt\nUnpackMe provides a unique service of proactive lookback on samples analyzed by the\nplatform based on a given Yara rule\nThe rule I\u2019ve created was simply based on unique strings that I found in the sample:\n7/11\n\nrule Win_KrakenStealer {\nmeta:\ndescription = \"Win_KrakenStealer rules\"\nstrings:\n$s1 = \"KrakenStub\" ascii wide\n$s2 = \"KrakenStub.exe\" ascii wide\n$s3 = \"Kraken_Keylogs_\" ascii wide\n$s4 = \"Kraken_Password_\" ascii wide\n$s5 = \"Kraken_Screenshot_\" ascii wide\n$s6 = \"Kraken_Clipboard_\" ascii wide\n$s7 = \"KrakenClipboardLog.txt\" ascii wide\ncondition:\nuint16(0) == 0x5a4d and 5 of ($s*)\n}\n\nAnd here is the result of the hunt:\n\nIn a 12 weeks lookback there were 11 samples that fitted the given Yara Rule, 8 of them\nwere marked as MassLogger, so I took a look at one of them\n\n8/11\n\nand by simply looking at the File Version Information we can see that it\u2019s 99% our\nKraken , I downloaded the sample and opened it in DnSpy and guess what?\n\nIt was our Kraken! so we found about 11 samples that are flagged falsely.\nAnd with that our hunt for samples is done, from here you can pretty much correlate some\nIOC\u2019s so see whether or not it\u2019s the same threat actor.\n\nOSINT Research\n9/11\n\nAt this part I wanted to try and find the origin of the malware, so I tried two things:\n1. Search engine dorking\n2. Underground forums\n\nSearch Engine Dorking\nI tried to search the term \"KrakenStub\" malware both in Google and DuckDuckGo, besides\ngiving me 2 analysis one of JoeSandbox and the second one of Vmray I couldn\u2019t finding\nanything useful but it always good to try and search using search engines because you can\u2019t\nreally know what you can find\u2026\n\nUnderground Forums\nthere are several underground/hacking forums that you can find on the clean web without the\nneeds going to TOR and pivoting around the darknet.\nOne of the most known hacking forums out there is HackForums , so I tried my luck and\nsearched through the marketplace forum for \u201cKraken\u201d keywords, and after quite some time\nand found this thread :#1 KrakenKeylogger | 3 Senders | E-Mail Client & Browser\nRecovery | Perfect Features sold by a user named Krakenz:\n\nWhat a perfect hit!\nthat particular finding made my day, I knew that this is it, I\u2019ve closed the circle and I can close\nthis case and fully resolved.\n\nExtra Findings\nAfter I\u2019ve published part 1 of analyzing the Kraken, @jw4lsec and me had a small\nconversation and he shared with me that Windows Defender was flagging the sample I\u2019ve\nshared during the investigation as a different malware upon each different execution attempt:\n10/11\n\nSummary\nIn the 2nd part of analyzing the Kraken I\u2019ve showed you my way of thinking and approach to\nthe process of threat hunting, especially when your guts tells you that something here is not\nright. I hope that during those 2 parts of analysis you\u2019ve learned new things, feel free to PM\nme via any social media.\n\n11/11",
+    "language": "EN",
+    "sources": [
+        {
+            "id": "05d7b179-7656-44d8-a74c-9ab34d3df3a2",
+            "created_at": "2023-01-12T14:38:44.599904Z",
+            "updated_at": "2023-01-12T14:38:44.599904Z",
+            "deleted_at": null,
+            "name": "VXUG",
+            "url": "https://www.vx-underground.org",
+            "description": "vx-underground Papers",
+            "reports": null
+        }
+    ],
+    "references": [
+        "https://papers.vx-underground.org/papers/Malware Defense/Malware Analysis 2023/2023-05-26 - Kraken - The Deep Sea Lurker Part 2.pdf"
+    ],
+    "report_names": [
+        "2023-05-26 - Kraken - The Deep Sea Lurker Part 2.pdf"
+    ],
+    "threat_actors": [
+        {
+            "id": "faa4a29b-254a-45bd-b412-9a1cbddbd5e3",
+            "created_at": "2022-10-25T16:07:23.80111Z",
+            "updated_at": "2024-11-22T02:02:01.077409Z",
+            "deleted_at": null,
+            "main_name": "LookBack",
+            "aliases": [
+                "FlowingFrog",
+                "LookBack",
+                "LookingFrog",
+                "TA410",
+                "Witchetty"
+            ],
+            "source_name": "ETDA:LookBack",
+            "tools": [
+                "FlowCloud",
+                "GUP Proxy Tool",
+                "SodomMain",
+                "SodomMain RAT",
+                "SodomNormal"
+            ],
+            "source_id": "ETDA",
+            "reports": null
+        }
+    ],
+    "ts_created_at": 1685930800985,
+    "ts_updated_at": 1732241015537,
+    "ts_creation_date": 1685883755000,
+    "ts_modification_date": 1685883755000,
+    "files": {
+        "pdf": "https://archive.orkl.eu/4a1900ea23505d94a251adae3bba9a8c5a894cb3.pdf",
+        "text": "https://archive.orkl.eu/4a1900ea23505d94a251adae3bba9a8c5a894cb3.txt",
+        "img": "https://archive.orkl.eu/4a1900ea23505d94a251adae3bba9a8c5a894cb3.jpg"
+    }
+}

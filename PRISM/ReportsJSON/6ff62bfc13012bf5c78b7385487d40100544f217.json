@@ -1,0 +1,76 @@
+{
+    "id": "f6dab9af-c485-4c3a-83a8-c1ef8d07abf9",
+    "created_at": "2023-05-06T02:09:51.800788Z",
+    "updated_at": "2024-11-22T02:03:20.31477Z",
+    "deleted_at": null,
+    "sha1_hash": "6ff62bfc13012bf5c78b7385487d40100544f217",
+    "title": "2023-04-03 - ALPHV Ransomware Affiliate Targets Vulnerable Backup Installations to Gain Initial Access",
+    "authors": "",
+    "file_creation_date": "2023-05-05T02:00:20Z",
+    "file_modification_date": "2023-05-05T02:00:20Z",
+    "file_size": 909265,
+    "plain_text": "ALPHV Ransomware Affiliate Targets Vulnerable Backup\nInstallations to Gain Initial Access\nmandiant.com/resources/blog/alphv-ransomware-backup\n\nMandiant has observed a new ALPHV (aka BlackCat ransomware) ransomware affiliate,\ntracked as UNC4466, target publicly exposed Veritas Backup Exec installations, vulnerable\nto CVE-2021-27876, CVE-2021-27877 and CVE-2021-27878, for initial access to victim\nenvironments. A commercial Internet scanning service identified over 8,500 installations of\nVeritas Backup Exec instances that are currently exposed to the internet, some of which may\nstill be unpatched and vulnerable. Previous ALPHV intrusions investigated by Mandiant\nprimarily originated from stolen credentials suggesting a shift to opportunistic targeting of\nknown vulnerabilities. This blog post covers the UNC4466 attack lifecycle, indicators, and\ndetection opportunities.\n\n1/11\n\nALPHV emerged in November 2021 as a ransomware-as-a-service that some researchers\nhave claimed is the successor to BLACKMATTER and DARKSIDE ransomware. While some\nransomware operators enacted rules to avoid impacting critical infrastructure and health\nentities, ALPHV has continued to target these sensitive industries.\n\nTimeline\nIn March 2021, Veritas published an advisory reporting three critical vulnerabilities in\nVeritas Backup Exec 16.x, 20.x and 21.x.\nOn September 23, 2022, a METASPLOIT module was released which exploits these\nvulnerabilities and creates a session which the threat actor can use to interact with the\nvictim system.\nOn October 22, 2022, Mandiant first observed exploitation of the Veritas vulnerabilities\nin the wild.\n\nAttack Phases\nInitial Compromise and Establish Foothold\nIn late 2022, UNC4466 gained access to an internet-exposed Windows server, running\nVeritas Backup Exec version 21.0 using the Metasploit module\n`exploit/multi/veritas/beagent_sha_auth_rce`. Shortly after, the Metasploit persistence\nmodule was invoked to maintain persistent access to the system for the remainder of this\nintrusion.\n\nInternal Reconnaissance\nAfter gaining access to the Veritas Backup Exec server, UNC4466 used Internet Explorer,\nthe browser installed by default on older Windows systems, to download Famatech\u2019s\nAdvanced IP Scanner from its website, hxxps://download.advanced-ip-scanner[.]com. This\ntool is capable of scanning individual IP addresses or IP address ranges for open ports, and\nreturns hostnames, operating system and hardware manufacturer information.\nUNC4466 also made use of ADRecon to gather network, account, and host information in\nthe victim\u2019s environment. When executed by a privileged domain account, ADRecon\ngenerates several reports about the Active Directory environment, including the Trusts, Sites,\nSubnets, password policies, user and computer account listings. These reports can be\ngenerated in a variety of formats, including CSV, XML, JSON, and HTML.\n\nIngress Tool Transfer\n\n2/11\n\nUNC4466 made heavy use of the Background Intelligent Transfer Service (BITS) to\ndownload additional tools such as LAZAGNE, LIGOLO, WINSW, RCLONE, and finally the\nALPHV ransomware encryptor.\n\nCommand and Control\nUNC4466 leveraged SOCKS5 tunneling to communicate with compromised systems in the\nvictim network. This technique is typically used to evade network defenses or other\npreventative network controls. Two separate tools were deployed to execute this technique,\nLIGOLO and REVSOCKS.\n\nEscalate Privileges\nThe threat actor utilized multiple credential access tools, including Mimikatz, LaZagne and\nNanodump to gather clear-text credentials and credential material.\nIn November 2022, UNC4466 utilized the MIMIKATZ Security Support Provider injection\nmodule (`MISC::MemSSP`). This module collects credentials in clear text as they are used,\nby manipulating the Local Security Authority Server Service (LSASS) on victim systems. This\nmodule creates a file named `C:\\Windows\\System32\\mimilsa.log`.\n\n[Nanodump] was also used to dump LSASS memory. Like the examples shown on\nHelpsystems' GitHub page, the output file specified was a file in the `C:\\Windows\\Temp`\ndirectory.\n\nDefense Evasion\nDuring operations, UNC4466 takes steps to evade detection. Apart from clearing event logs,\nUNC4466 also used the built in Set-MpPrefernce cmdlet to disable Microsoft Defender\u2019s realtime monitoring capability.\n\n3/11\n\npowershell.exe Set-MpPreference -DisableRealtimeMonitoring 1 -ErrorAction\nSilentlyContinue\n\nCommand and Control\nUNC4466 made use of BITS transfers (using the Start-BitsTransfer PowerShell cmdlet) to\ndownload various resources to the staging directory `c:\\ProgramData`. Using this technique,\nSOCKS5 tunneling tools, REVSOCKS and LIGOLO were downloaded from their official\nGitHub repositories.\n\nComplete Mission\nUNC4466 deploys the Rust-based ALPHV ransomware. In Late 2022, UNC4466 added\nimmediate tasks to the default domain policy. These tasks were configured to perform\nactions which disabled security software, downloaded the ALPHV encryptor, then execute it.\n\nExposure\nAs of this blog post's date, one commercial Internet scanning service reported over 8500 IP\naddresses which advertise the \"Symantec/Veritas Backup Exec ndmp\" service on the default\nport 10000, as well as port 9000 and port 10001. While this search result does not directly\nidentify vulnerable systems, as the application versions were not identifiable, it demonstrates\nthe prevalence of Internet exposed instances that could potentially be probed by attackers.\n\nDetection Opportunities\nDefenders should place priority on monitoring internet-exposed Veritas Backup Exec\nWindows installations, for versions before 21.2. Mandiant observed the exploitation of Veritas\nBackup Exec can leave a noticeable imprint on the Backup Exec log files. Where feasible,\nthese log files should be forwarded to a SIEM or similar technology which enables detection\nand alerting when certain events are recorded.\nIn addition to any available network connection logging, Veritas Backup Exec logs will record\nevidence of connections to remote systems.\n\n4/11\n\n[nnnn] YYYY-mm-ddTHH:MM:SS.sss [ndmp\\ndmpsrvr]\n\n+ ndmpd.cpp (nnn):\n\n[nnnn] YYYY-mm-ddTHH:MM:SS.sss [ndmp\\ndmpsrvr]\n\n| Session 1 started\n\n[nnnn] YYYY-mm-ddTHH:MM:SS.sss [ndmp\\ndmpsrvr]\nSSL for: 0x00000\n\n- sslOpen() : Opening\n\n[nnnn] YYYY-mm-ddTHH:MM:SS.sss [ndmp\\ndmpsrvr]\n0x00000; sslConn = 0x00000\n\n- sslOpen(): certinfo =\n\n[nnnn] YYYY-mm-ddTHH:MM:SS.sss [ndmp\\ndmpcomm]\n- ndmpRun: Control\nconnection accepted : connection established between end-points [Server\nIP]:10000 and [Remote IP]:[remote port]\n\nThese connections should be triaged for any unknown IP addresses. Additionally, these logs\ncan also record the execution of suspicious pre and post backup job commands.\n[nnnn] YYYY-mm-ddTHH:MM:SS.sss [ndmp\\ndmpsrvr]\nSetPreCommandEnvironment: Could not obtain the BE Job ID to pass to the\ncommand C:\\Windows\\System32\\cmd.exe /c \"C:\\Windows\\Temp\\[random chars].exe\"\n[nnnn] YYYY-mm-ddTHH:MM:SS.sss [ndmp\\ndmpsrvr]\n- Could not obtain the\nBE Job Name to pass to the command C:\\Windows\\System32\\cmd.exe /c\n\"C:\\Windows\\Temp\\[random chars].exe\"\n[nnnn] YYYY-mm-ddTHH:MM:SS.sss [ndmp\\ndmpsrvr]\n- At least one of the\nPre / Post Command environment variables could not be set\n[nnnn] YYYY-mm-ddTHH:MM:SS.sss [ndmp\\ndmpcomm]\nmessage on closed connection. Socket 0x8e0 len 0x0\n\n- ndmp_readit: Caught\n\nUNC4466\nDS0015 - Application log\nBackup Exec logs\nConnections to unknown IP addresses\nSuspicious pre or post job commands being set\n(SetPreCommandEnvironment/ SetPostCommandEnvironment). E.g:\nC:\\Windows\\System32\\cmd.exe /c\n\"C:\\Windows\\Temp\\UNKNOWN_EXEC.exe\u201d\nWindows Event Logs\nSuspicious BITS transfers with the source argument targeting unknown\nhosts and GitHub repositories.\nPre-ransomware activity: deletion of volume shadow copies\nDS0017 \u2013 Command\nDisabling AMSI: use of Set-MpPreference PowerShell cmdlet\nIngress tool transfer: Use of Start-BitsTransfer PowerShell cmdlet\n\n5/11\n\nDS0022 \u2013 File\nNew Executables created in staging directories: C:\\ProgramData,\nC:\\Windows\\Temp, C:\\Windows\\Tasks\nDS0024 \u2013 Windows Registry\nModification of Registry run keys\n\nOutlook\nMandiant recommends implementing secure access controls, segmenting networks,\nenabling multi-factor authentication, and regularly testing and evaluating backup strategies to\nlimit the impact of a ransomware attack. Additionally, organizations should inventory\nexternally facing services and reduce the attack surface available to attackers.\n\nAcknowledgements\nWith special thanks to Nick Richard for technical review.\n\nMITRE ATT&CK\nMandiant has observed UNC4466 use the following techniques:\nATT&CK Tactic\nCategory\n\nTechniques\n\nImpact\nT1486:\n\nData Encrypted for Impact\n\nT1489:\n\nService Stop\n\nT1490:\n\nInhibit System Recovery\n\nT1529:\n\nSystem Shutdown/Reboot\n\nT1047:\n\nWindows Management Instrumentation\n\nT1053:\n\nScheduled Task/Job\n\nExecution\n\n6/11\n\nT1053.005:\n\nScheduled Task\n\nT1059.001:\n\nPowerShell\n\nT1059.006:\n\nPython\n\nT1569.002:\n\nService Execution\n\nT1027:\n\nObfuscated Files or Information\n\nT1027.002:\n\nSoftware Packing\n\nT1027.009:\n\nEmbedded Payloads\n\nT1055:\n\nProcess Injection\n\nT1070.001:\n\nClear Windows Event Logs\n\nT1070.004:\n\nFile Deletion\n\nT1112:\n\nModify Registry\n\nT1134:\n\nAccess Token Manipulation\n\nT1134.001:\n\nToken Impersonation/Theft\n\nT1222:\n\nFile and Directory Permissions Modification\n\nT1497:\n\nVirtualization/Sandbox Evasion\n\nT1497.001:\n\nSystem Checks\n\nT1548.002:\n\nBypass User Account Control\n\nDefense Evasion\n\n7/11\n\nT1562.001:\n\nDisable or Modify Tools\n\nT1564.010:\n\nProcess Argument Spoofing\n\nT1574.011:\n\nServices Registry Permissions Weakness\n\nT1620:\n\nReflective Code Loading\n\nT1622:\n\nDebugger Evasion\n\nT1484.001\n\nDomain Policy Modification: Group Policy\nModification\n\nT1007:\n\nSystem Service Discovery\n\nT1012:\n\nQuery Registry\n\nT1016:\n\nSystem Network Configuration Discovery\n\nT1033:\n\nSystem Owner/User Discovery\n\nT1057:\n\nProcess Discovery\n\nT1082:\n\nSystem Information Discovery\n\nT1083:\n\nFile and Directory Discovery\n\nT1087:\n\nAccount Discovery\n\nT1135:\n\nNetwork Share Discovery\n\nT1543:\n\nCreate or Modify System Process\n\nDiscovery\n\nPersistence\n\n8/11\n\nT1543.003:\n\nWindows Service\n\nT1547.001\n\nBoot or Logon Autostart Execution: Registry Run\nKeys / Startup Folder\n\nT1095:\n\nNon-Application Layer Protocol\n\nT1105:\n\nIngress Tool Transfer\n\nT1021.001:\n\nRemote Desktop Protocol\n\nT1213:\n\nData from Information Repositories\n\nT1583.003:\n\nVirtual Private Server\n\nCommand and\nControl\n\nLateral Movement\n\nCollection\n\nResource\nDevelopment\n\nIndicators of Compromise\nda202cc4b3679fdb47003d603a93c90d\n\nMIMIKATZ\n\n5fe66b2835511f9d4d3703b6c639b866\n\nNANODUMP\n\n1f437347917f0a4ced71fb7df53b1a05\n\nLIGOLO\n\nb41dc7bef82ef384bc884973f3d0e8ca\n\nREVSOCKS\n\nc590a84b8c72cf18f35ae166f815c9df\n\nSysinternals PSEXEC\n\n9/11\n\n24b0f58f014bd259b57f346fb5aed2ea\n\nWINSW\n\ne31270e4a6f215f45abad65916da9db4\n\nREVSOCKS\n\n4fdabe571b66ceec3448939bfb3ffcd1\n\nAdvanced Port Scanner\n\n68d3bf2c363144ec6874ab360fdda00a\n\nLAZAGNE\n\nee6e0cb1b3b7601696e9a05ce66e7f37\n\nALPHV\n\nf66e1d717b54b95cf32154b770e10ba4\n\nMETASPLOIT\n\n17424a22f01b7b996810ba1274f7b8e9\n\nMETASPLOIT\n\n45[.]61[.]138[.]109\n185[.]141[.]62[.]123\n5[.]199[.]169[.]209\n45[.]61[.]138[.]109:45815\n45[.]61[.]138[.]109:43937\n45[.]61[.]138[.]109:36931\n5[.]199[.]169[.]209:31600\n45[.]61[.]138[.]109:41703\n185[.]99[.]135[.]115:39839\n185[.]99[.]135[.]115:41773\n45[.]61[.]138[.]109:33971\n\n10/11\n\n185[.]141[.]62[.]123:50810\n185[.]99[.]135[.]115:49196\nhxxp://185[.]141[.]62[.]123:10228/update[.]exe\n\n11/11",
+    "language": "EN",
+    "sources": [
+        {
+            "id": "05d7b179-7656-44d8-a74c-9ab34d3df3a2",
+            "created_at": "2023-01-12T14:38:44.599904Z",
+            "updated_at": "2023-01-12T14:38:44.599904Z",
+            "deleted_at": null,
+            "name": "VXUG",
+            "url": "https://www.vx-underground.org",
+            "description": "vx-underground Papers",
+            "reports": null
+        }
+    ],
+    "references": [
+        "https://papers.vx-underground.org/papers/Malware Defense/Malware Analysis 2023/2023-04-03 - ALPHV Ransomware Affiliate Targets Vulnerable Backup Installations to Gain Initial Access.pdf"
+    ],
+    "report_names": [
+        "2023-04-03 - ALPHV Ransomware Affiliate Targets Vulnerable Backup Installations to Gain Initial Access.pdf"
+    ],
+    "threat_actors": [
+        {
+            "id": "6e23ce43-e1ab-46e3-9f80-76fccf77682b",
+            "created_at": "2022-10-25T16:07:23.303713Z",
+            "updated_at": "2024-11-22T02:02:00.934294Z",
+            "deleted_at": null,
+            "main_name": "ALPHV",
+            "aliases": [
+                "ALPHV",
+                "ALPHVM",
+                "BlackCat Gang",
+                "UNC4466"
+            ],
+            "source_name": "ETDA:ALPHV",
+            "tools": [
+                "ALPHV",
+                "ALPHVM",
+                "BlackCat",
+                "GO Simple Tunnel",
+                "GOST",
+                "Impacket",
+                "LaZagne",
+                "MEGAsync",
+                "Mimikatz",
+                "Munchkin",
+                "Noberus",
+                "PsExec",
+                "Remcom",
+                "RemoteCommandExecution",
+                "WebBrowserPassView"
+            ],
+            "source_id": "ETDA",
+            "reports": null
+        }
+    ],
+    "ts_created_at": 1683338991800,
+    "ts_updated_at": 1732241000314,
+    "ts_creation_date": 1683252020000,
+    "ts_modification_date": 1683252020000,
+    "files": {
+        "pdf": "https://archive.orkl.eu/6ff62bfc13012bf5c78b7385487d40100544f217.pdf",
+        "text": "https://archive.orkl.eu/6ff62bfc13012bf5c78b7385487d40100544f217.txt",
+        "img": "https://archive.orkl.eu/6ff62bfc13012bf5c78b7385487d40100544f217.jpg"
+    }
+}

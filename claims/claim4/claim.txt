@@ -1,8 +1,0 @@
-This work contributes a UI that assists the Analysts in analyzing the reports and labeling the extracted indicators.
-The UI has two modes, BAP and GAP, each one used to the corresponding part of the PRISM dataset creation.
-
-We claim that the junior analysts, when assisted by LANCE generated labels and justifications (BAP) achieve higher precision, recall, and F1 scores when labeling IoCs from unstructured threat reports.
-
-This is seen by comparing the performance of the analysts on the reports they analyzed using the BAP mode of the UI compared to the GAP.
-Given that there was no overlap of the reports used in GAP and BAP we evaluate the analysts performance on each one compare to that of LANCE with ChatGPT 4o.
-We show that the performance of the analysts without the LANCE assistance is worse than LANCE while whit LANCE labels and justifications the performance of the analysts is better than LANCE.

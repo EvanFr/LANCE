@@ -1,0 +1,917 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>PDF Viewer</title>
+    <style>
+        /* Header styling */
+        header {
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 2vh;
+            background-color: #f8f9fa;
+            padding: 10px;
+            display: flex;
+            gap: 10px;
+            align-items: center;
+            box-shadow: 0 2px 5px rgba(0, 0, 0, 0.1);
+            z-index: 1000;
+        }
+
+        /* Basic layout for a two-column view */
+        body {
+            display: flex;
+            margin: 0;
+        }
+        
+        /* Main layout for sidebar and PDF viewer */
+        .main-container {
+            display: flex;
+            height: 94vh; /* Full viewport height */
+            padding-top: 4vh; /* Adjusts the height to account for fixed header */
+            overflow: hidden;
+        }
+
+        /* Sidebar styling */
+        .sidebar {
+            height: inherit;
+            background-color: #f4f4f4;
+            overflow-y: auto;
+            box-sizing: border-box;
+            padding: 1.5vh;
+        }
+
+        .list-sidebar{
+            display: none;
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 20vw;
+            height: 100vh;
+            background-color: #f4f4f4;
+            overflow-y: scroll;
+            box-sizing: border-box;
+            padding: 1.5vh;
+            z-index: 1000;
+        }
+
+        /* Controls for upload and download buttons */
+        .controls {
+            padding: 10px;
+            background-color: #ffffff;
+            display: flex;
+            gap: 10px;
+            box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
+        }
+
+        /* PDF section styling */
+        .pdf-section {
+            flex-grow: 1; /* Take up the remaining horizontal space */
+            display: flex;
+            flex-direction: column;
+            height: 96vh;
+            overflow: auto;
+        }
+
+        .pdf-viewport {
+            overflow-y: auto; /* Enable vertical scrolling */
+            overflow-x: auto; /* Hide horizontal scroll on viewport */
+            height: 100vh; /* Full viewport height */
+            flex: 1;
+            width: calc(100% - 20vw); /* Adjust width to avoid overlap with sidebar */
+            position: fixed; /* Fixes the scroll bar position on the screen */
+            /* right: 0; /* Aligns viewport with right edge */
+        }
+
+        .pdf-container {
+            width: 100%; /* Match the viewport width */
+            transform-origin: top left; /* For zoom transformations */
+        }
+
+        
+        /* Container for each PDF page */
+        .page-div {
+            position: relative;
+            width: 100%;
+            max-width: 100%;
+        }
+
+        .pdf-page {
+            display: block;
+            width: 100%;
+        }
+
+        .comment-details{
+            height: 30hv;
+            overflow: hidden;
+            box-sizing: border-box;
+        }
+
+        .comment-text {
+            flex-grow: 1;
+            overflow-y: auto;
+            height: 100vh;
+        }
+        .comment-input-container {
+            display: flex;
+            gap: 5px;
+            padding-top: 10px;
+        }
+
+        .replies{
+            margin-top: 10px; 
+            max-height: 30vh; 
+            overflow-y: auto; 
+            border-top: 1px solid #ccc; 
+            padding-top: 10px;
+        }
+
+        .comment-box {
+            position: absolute;
+            border: 2px solid transparent;
+            cursor: pointer;
+            opacity: 0.6;
+            z-index: 10;
+        }
+
+        /* Sidebar PDF Viewer Styling */
+        #pdf-sidebar-view {
+            display: none; /* Initially hidden */
+            position: absolute;
+            top: 4vh; /* Below the header */
+            right: 0;
+            width: 40vw; /* Adjust width as needed */
+            height: 96vh; /* Full height below the header */
+            background-color: #ffffff;
+            box-shadow: 2px 0 5px rgba(0, 0, 0, 0.1);
+            overflow: auto;
+            z-index: 1000; /* Above other elements */
+            border-left: 1px solid #ccc; /* Optional border for clarity */
+        }
+    </style>
+</head>
+<body>
+    <div class="main-container">
+        <!-- Header with upload and download buttons -->
+        <header>
+            <input type="file" id="pdf-upload" accept="application/pdf">
+            <button onclick="togleList()" id="toggle-sidebar">☰ Toggle PDF List</button>
+            <button id="download-csv" disabled onclick="downloadCSV()">Download CSV</button>
+            <button id="download-json" disabled onclick="downloadJSON()">Download JSON</button>
+            <button onclick="zoomIn()">Zoom In</button>
+            <button onclick="zoomOut()">Zoom Out</button>
+            <button onclick="toggleAnnotationStyle()">Toggle Annotation Style</button>
+            <button id="open-in-tab" disabled>Open PDF in New Tab</button>
+            <button id="open-in-sidebar" onclick="openInSidebar()" disabled>Open PDF in Sidebar</button>
+            <button id="open-text-in-sidebar" onclick="openTextInSidebar()" disabled>Open Text in Sidebar</button>
+
+        </header>
+
+        <div id="list-sidebar" style="display: none;">
+            <h3>PDF List</h3>
+            <ul id="pdf-list"></ul>
+        </div>
+        
+        
+        <!-- Sidebar for displaying comment details -->
+        <div class="sidebar" id="sidebar" style = "width: 20vw;">
+            <div id="unlabeled-comments">
+                <h3>Unlabeled Indicators: <span id="unlabeled-comments-num">0</span></h3>
+            </div>
+            <div id="pdf-file-name" style="padding: 10px; font-weight: bold; text-align: center;">
+                No file loaded
+            </div>
+        
+            <div id="comment-details">
+                <h3>Comment Details</h3>
+                <div id="comment-text">
+                    <h4>Indicator: <span id="comment-title"></span></h4>
+                    
+                    <!-- Chat-like Replies Section -->
+                    <div id="replies" >
+                        <p>No replies yet.</p>
+                    </div>
+                
+                    <!-- Reply Input Field -->
+                    <input type="text" id="reply-input" placeholder="Type a reply..." style="width: 100%; margin-top: 10px;">
+                    <button id="send-reply-button" disabled onclick="addReply()" style="width: 100%; margin-top: 5px;">Send Reply</button>
+                </div>
+                <!-- Toggle Color Button (Initially Disabled) -->
+                <button id="toggle-color-button" disabled onclick="toggleSelectedComment()">Toggle Label</button>
+            </div>
+            
+            <h3>Time Spent:</h3>
+            
+            <div id="timer-container">
+                <p id="timer">00:00:00</p>
+            </div>
+            <button id="toggle-timer-btn" onclick="toggleTimerVisibility()">Hide Timer</button>
+
+            
+            
+        </div>
+
+        <!-- Main PDF viewer area with controls -->
+        <div class="pdf-section">
+            <!-- New fixed viewport wrapper -->
+            <div class="pdf-viewport" id="pdf-viewport">
+                <!-- Scrollable and zoomable PDF container -->
+                <div class="pdf-container" id="pdf-container">
+                    <!-- PDF content will be loaded here -->
+                </div>
+
+            </div>
+            <!-- Left-side PDF Viewer -->
+            <div id="pdf-sidebar-view"></div>
+        </div>
+    </div>
+
+    
+
+    <script>
+
+        // To store the state of seen PDFs
+        const seenPDFs = new Set();
+
+        let timerInterval;
+        let totalSeconds = 0;
+
+        // Function to update the timer display
+        function updateTimer() {
+            const hours = Math.floor(totalSeconds / 3600).toString().padStart(2, '0');
+            const minutes = Math.floor((totalSeconds % 3600) / 60).toString().padStart(2, '0');
+            const seconds = (totalSeconds % 60).toString().padStart(2, '0');
+            document.getElementById('timer').textContent = `${hours}:${minutes}:${seconds}`;
+        }
+
+        // Function to start the timer
+        function startTimer() {
+            if (timerInterval) clearInterval(timerInterval); // Reset any existing timer
+            totalSeconds = 0;
+            updateTimer();
+            timerInterval = setInterval(() => {
+                totalSeconds++;
+                updateTimer();
+            }, 1000);
+        }
+
+        // Function to stop and send total time to backend
+        async function stopAndSendTime(downloadType) {
+            if (timerInterval) {
+                clearInterval(timerInterval);
+                timerInterval = null;
+            }
+
+            // Send the total time to the backend
+            await fetch('/update_time_spent', {
+                method: 'POST',
+                headers: { 'Content-Type': 'application/json' },
+                body: JSON.stringify({time_spent: totalSeconds })
+            });
+        }
+
+        function toggleTimerVisibility() {
+            const timerContainer = document.getElementById('timer-container');
+            const toggleButton = document.getElementById('toggle-timer-btn');
+
+            if (timerContainer.style.display === 'none') {
+                timerContainer.style.display = 'block';
+                toggleButton.textContent = 'Hide Timer';
+            } else {
+                timerContainer.style.display = 'none';
+                toggleButton.textContent = 'Show Timer';
+            }
+        }
+
+
+        async function togleList(){
+            const sidebar = document.getElementById('list-sidebar');
+            if (sidebar.style.display === 'none'){
+                sidebar.style.display = 'block';
+                await fetchPDFList();
+            }else{
+                sidebar.style.display = 'none';
+            }
+        }
+
+        async function fetchPDFList() {
+            const response = await fetch('/list_pdfs');
+            const pdfList = await response.json();
+            const pdfListElement = document.getElementById('pdf-list');
+
+            pdfListElement.innerHTML = '';
+            pdfList.forEach(pdf => {
+                const listItem = document.createElement('li');
+                listItem.style.cursor = 'pointer';
+
+                // Add a checkbox for marking PDFs as seen
+                const checkbox = document.createElement('input');
+                checkbox.type = 'checkbox';
+                checkbox.style.marginRight = '10px';
+                checkbox.checked = seenPDFs.has(pdf);
+
+                // Prevent loading the PDF when clicking the checkbox
+                checkbox.addEventListener('click', (event) => {
+                    event.stopPropagation(); // Prevents triggering the click event for the list item
+                    if (checkbox.checked) {
+                        seenPDFs.add(pdf);
+                    } else {
+                        seenPDFs.delete(pdf);
+                    }
+                });
+
+                // Add the file name text with a click handler for loading the PDF
+                const pdfNameSpan = document.createElement('span');
+                pdfNameSpan.textContent = pdf;
+                pdfNameSpan.addEventListener('click', () => loadPDF(pdf));
+
+                // Append checkbox and text to the list item
+                listItem.appendChild(checkbox);
+                listItem.appendChild(pdfNameSpan);
+                pdfListElement.appendChild(listItem);
+            });
+        }
+
+        
+        document.getElementById('reply-input').addEventListener('keydown', function(event) {
+            if (event.key === 'Enter') { // Check if Enter key was pressed
+                event.preventDefault(); // Prevent default Enter behavior (e.g., form submission)
+                addReply(); // Call the addReply function to send the reply
+            }
+        });
+
+
+        let zoomLevel = 1;  // Initial zoom level (100%)
+
+        document.addEventListener('wheel', (event) => {
+            if (event.metaKey) { // Checks if Command key is pressed
+                event.preventDefault(); // Prevents default scrolling
+                if (event.deltaY < 0) { // Scroll up (zoom in)
+                    zoomIn();
+                } else if (event.deltaY > 0) { // Scroll down (zoom out)
+                    zoomOut();
+                }
+            }
+        });
+
+        document.addEventListener('wheel', (event) => {
+            if (event.shiftKey) { // Checks if Shift key is pressed
+                event.preventDefault(); // Prevents vertical scroll
+
+                // Scroll horizontally based on the deltaY value
+                const container = document.getElementById('pdf-viewport');
+                container.scrollLeft += event.deltaY; // Use deltaY for horizontal scroll when Shift is pressed
+            }
+        });
+
+        function zoomIn() {
+            zoomLevel += 0.1;  // Increase zoom level by 10%
+            applyZoom();
+        }
+
+        function zoomOut() {
+            zoomLevel = Math.max(0.1, zoomLevel - 0.1);  // Decrease zoom level by 10%, minimum 10%
+            applyZoom();
+        }
+
+        function applyZoom() {
+            const container = document.getElementById('pdf-container');
+            
+            // Apply scale transformation to the entire PDF container based on zoomLevel
+            container.style.transform = `scale(${zoomLevel})`;
+            container.style.transformOrigin = 'top left';  // Set origin to top left for natural zooming
+            
+            // Re-render annotations with updated zoom level
+            pdfData.pages.forEach((page, index) => {
+                const pageDiv = container.querySelectorAll('.page-div')[index];
+                const img = pageDiv.querySelector('img');
+                renderAnnotations(page, pageDiv, img);
+            });
+        }
+
+
+        let pdfData;
+
+        async function loadPDF(pdfName) {
+
+            togleList();
+
+
+            const response = await fetch('/load_pdf', {
+                method: 'POST',
+                headers: {
+                    'Content-Type': 'application/json'
+                },
+                body: JSON.stringify({ pdf_name: pdfName })
+            });
+
+            if (response.ok) {
+                pdfData = await response.json();
+
+                // Update the file name in the sidebar
+                const fileNameElement = document.getElementById('pdf-file-name');
+                fileNameElement.textContent = `File: ${pdfName}`;
+
+                if (sidebar_state === "PDF"){
+                    openInSidebar();
+                    openInSidebar();
+                }
+                else if (sidebar_state === "Text"){
+                    openTextInSidebar();
+                    openTextInSidebar();
+                }
+                else{
+                    renderPDF(pdfData.pages);
+                }
+
+                // Mark the PDF as seen
+                seenPDFs.add(pdfName);
+
+                // Refresh the list to reflect updated checkboxes
+                await fetchPDFList();
+
+
+                // Start the timer
+                startTimer();
+
+                
+            } else {
+                alert('Failed to load PDF');
+            }
+        }
+
+
+        document.getElementById('open-in-tab').addEventListener('click', function () {
+            window.open(`/get_pdf`, '_blank');
+        });
+
+        async function uploadPDF(event) {
+            const file = event.target.files[0];
+            const formData = new FormData();
+            formData.append('file', file);
+
+            const response = await fetch('/upload', { method: 'POST', body: formData });
+
+            if (response.ok) {
+                pdfData = await response.json();
+                // Replace the current PDF display logic with the new PDF data
+
+                // Update the file name in the sidebar
+                const fileNameElement = document.getElementById('pdf-file-name');
+                fileNameElement.textContent = `File: ${file.name}`;
+
+                if (sidebar_state === "PDF"){
+                    openInSidebar();
+                }
+                else if (sidebar_state === "Text"){
+                    openTextInSidebar();
+                }
+                else{
+                    renderPDF(pdfData.pages);
+                }
+
+
+                // Mark the PDF as seen
+                seenPDFs.add(file.name);
+
+                // Refresh the list to reflect updated checkboxes
+                await fetchPDFList();
+
+            } else {
+                alert('Failed to load PDF');
+            }
+        }
+
+        async function renderPDF(pdfDataPages){
+            const sidebarView = document.getElementById('pdf-sidebar-view');
+            sidebarView.style.display = 'none';
+            sidebarView.innerHTML = '';
+            const container = document.getElementById('pdf-container');
+            container.innerHTML = '';  // Clear previous content
+
+            pdfDataPages.forEach(page => {
+                const pageDiv = document.createElement('div');
+                pageDiv.className = 'page-div';
+
+                // Add PDF image
+                const img = document.createElement('img');
+                img.src = page.image;
+                img.className = 'pdf-page';
+                pageDiv.appendChild(img);
+
+                // Render annotations when the image loads
+                img.onload = () => renderAnnotations(page, pageDiv, img);
+
+                container.appendChild(pageDiv);
+            });
+            
+            showCommentDetails(null)
+
+            const openInTabButton = document.getElementById('open-in-tab');
+            openInTabButton.disabled = false;
+            document.getElementById('open-in-sidebar').disabled = false;
+            document.getElementById('open-text-in-sidebar').disabled = false;
+            document.getElementById('download-json').disabled = false;
+            document.getElementById('download-csv').disabled = false;
+            
+        }
+
+        function updateRemainingCommentCount() {
+            let totalComments = 0;
+            const blueComments = pdfData.pages.reduce((count, page) =>  
+                count + page.comments.filter(comment => comment.toggleCount === undefined).length, 0);
+            document.getElementById('unlabeled-comments-num').innerText = blueComments;
+        }
+
+        sidebar_state = "closed";
+
+        function openInSidebar() {
+            const sidebarView = document.getElementById('pdf-sidebar-view');
+            const pdfViewport = document.getElementById('pdf-viewport');
+
+            // Toggle visibility of the sidebar view
+            if (sidebarView.style.display === 'none' || sidebar_state === "Text") {
+                // Ensure the current PDF is loaded
+                if (pdfData) {
+                    sidebar_state = "PDF";
+                    const embed = document.createElement('embed');
+                    embed.src = `/get_pdf`; // Ensure this endpoint serves the PDF as a file
+                    embed.type = 'application/pdf';
+                    embed.style.width = '100%';
+                    embed.style.height = '100%';
+
+                    // Clear any existing content and append the embed element
+                    sidebarView.innerHTML = '';
+                    sidebarView.appendChild(embed);
+
+                    // Show the sidebar view
+                    sidebarView.style.display = 'block';
+
+                    pdfViewport.style.width = 'calc(60% - 20vw)'; // Adjust the width to accommodate the sidebar view
+
+                } else {
+                    alert('No PDF loaded to display.');
+                }
+            } else {
+                // Hide the sidebar view
+                sidebarView.style.display = 'none';
+                sidebarView.innerHTML = ''; // Clear content
+                pdfViewport.style.width = 'calc(100% - 20vw)'; // Adjust the width back to full viewport
+                renderPDF(pdfData.pages);
+
+            }
+        }
+
+        async function openTextInSidebar() {
+            const sidebarView = document.getElementById('pdf-sidebar-view');
+            const pdfViewport = document.getElementById('pdf-viewport');
+
+            // Toggle visibility of the sidebar view
+            if (sidebarView.style.display === 'none' || sidebar_state === "PDF") {
+                // Ensure the current PDF is loaded
+                if (pdfData) {
+                    const response = await fetch('/get_pdf_text');
+                    if (response.ok) {
+                        sidebar_state = "Text";
+                        const textContent = await response.text();
+                        
+                        // Display the text content in the sidebar
+                        sidebarView.innerHTML = `<div style="padding: 10px; font-family: Arial, sans-serif; white-space: pre-wrap;">${textContent}</div>`;
+                        sidebarView.style.display = 'block';
+
+                        pdfViewport.style.width = 'calc(60% - 20vw)'; // Adjust the width to accommodate the sidebar view
+                    } else {
+                        alert('Failed to fetch PDF text.');
+                    }
+                } else {
+                    alert('No PDF loaded to display.');
+                }
+            } else {
+                // Hide the sidebar view
+                sidebarView.style.display = 'none';
+                sidebarView.innerHTML = ''; // Clear content
+                pdfViewport.style.width = 'calc(100% - 20vw)'; // Adjust the width back to full viewport
+            }
+        }
+
+        let selectedComment = null; // Track the currently selected comment
+
+        function showCommentDetails(comment) {
+            if (comment == null){
+                selectedComment = null;
+                document.getElementById('comment-title').innerText = '';
+                document.getElementById('replies').innerHTML = '<p>No replies yet.</p>';
+                document.getElementById('toggle-color-button').disabled = true; // Disable the button when no comment is selected
+                document.getElementById('send-reply-button').disabled = true; // Disable the button when no comment is selected
+                return;
+            }
+
+            const commentText = document.getElementById('comment-text');
+            const toggleButton = document.getElementById('toggle-color-button');
+            const replyButton = document.getElementById('send-reply-button');
+
+            document.getElementById('comment-title').innerText = comment.title;
+
+            // Display existing replies
+            const repliesDiv = document.getElementById('replies');
+            repliesDiv.innerHTML = '';
+            if (comment.replies && comment.replies.length > 0) {
+                comment.replies.forEach(reply => {
+                    const replyDiv = document.createElement('div');
+                    replyDiv.style.margin = '5px 0';
+                    replyDiv.innerHTML = `<strong>${reply.user}</strong>: ${reply.text}`;
+                    repliesDiv.appendChild(replyDiv);
+                });
+            } else {
+                repliesDiv.innerHTML = '<p>No replies yet.</p>';
+            }
+
+            // Set the selected comment and enable the toggle button
+            selectedComment = comment;
+            toggleButton.disabled = false; // Enable the button when a comment is selected
+        
+            replyButton.disabled = false; // Enable the button when a comment is selected
+        }
+
+        async function addReply() {
+            const replyText = document.getElementById('reply-input').value;
+            const replies = document.getElementById('replies');
+
+            if (replyText && selectedComment) {
+                const response = await fetch('/add_reply', {
+                    method: 'POST',
+                    headers: { 'Content-Type': 'application/json' },
+                    body: JSON.stringify({ title: selectedComment.title, reply: replyText })
+                });
+
+                if (response.ok) {
+                    // Update local data to reflect the new reply
+                    if (!selectedComment.replies) selectedComment.replies = [];
+                    // selectedComment.replies.push({ user: 'You', text: replyText });
+
+                    pdfData.pages.forEach(page => {
+                        page.comments.forEach(comment => {
+                            if (comment.title === selectedComment.title) {
+                                if (!comment.replies) comment.replies = [];
+                                comment.replies.push({ user: 'You', text: replyText });
+                            }
+                        });
+                    });
+                    
+                    // Update the displayed replies
+                    showCommentDetails(selectedComment);
+                    document.getElementById('reply-input').value = ''; // Clear the input
+                } else {
+                    console.error('Failed to add reply');
+                }
+
+
+                // Auto-scroll to the latest message
+                replies.scrollTop = replies.scrollHeight;
+            }
+        }
+
+        async function toggleSelectedComment() {
+            if (selectedComment) {
+                const commentBoxes = document.querySelectorAll('.comment-box');
+                // Find the box for the selected comment
+                const selectedBox = Array.from(commentBoxes).find(
+                    box => box.getAttribute('data-title') === selectedComment.title
+                );
+                
+                if (selectedBox) {
+                    // Call toggleComment to toggle the color
+                    await toggleComment(selectedComment, selectedBox);
+                }
+            }
+        }
+
+        let filledAnnotationStyle = false; // Initial style: border-only
+        sellectedComment = null;
+
+        function toggleAnnotationStyle() {
+            filledAnnotationStyle = !filledAnnotationStyle; // Toggle the style state
+
+            // Update all annotations on all pages with the selected style
+            const container = document.getElementById('pdf-container');
+            pdfData.pages.forEach((page, index) => {
+                const pageDiv = container.querySelectorAll('.page-div')[index];
+                const img = pageDiv.querySelector('img');
+                renderAnnotations(page, pageDiv, img); // Re-render with new style
+            });
+        }
+
+        function renderAnnotations(page, pageDiv, img) {
+            const actualWidth = img.naturalWidth * zoomLevel;
+            const actualHeight = img.naturalHeight * zoomLevel;
+
+            // Clear existing comment boxes to avoid duplications
+            pageDiv.querySelectorAll('.comment-box').forEach(box => box.remove());
+
+            page.comments.forEach(comment => {
+                const commentBox = document.createElement('div');
+                commentBox.className = 'comment-box';
+
+                commentBox.setAttribute('data-title', comment.title);
+                if (filledAnnotationStyle) {
+                    parameter = 0;
+                }else{
+                    parameter = 0.2;
+                }
+
+                // Set position and dimensions based on zoom level
+                commentBox.style.left = `${((comment.x0 / img.naturalWidth) * 100)-parameter}%`;
+                commentBox.style.top = `${((comment.y0 / img.naturalHeight) * 100)-parameter}%`;
+                commentBox.style.width = `${((comment.x1 - comment.x0) / (img.naturalWidth*zoomLevel)) * 100}%`;
+                commentBox.style.height = `${((comment.y1 - comment.y0) / (img.naturalHeight*zoomLevel)) * 100}%`;
+
+
+                if (filledAnnotationStyle) {
+                    if(!comment.toggleCount){
+                        commentBox.style.backgroundColor = 'rgba(0,0,255,0.3)'; // Initial color blue
+                    }else{
+                        commentBox.style.backgroundColor = (comment.color[0] === 0.41999998688697815 && comment.color[1] === 0.8500000238418579 && comment.color[2] === 0.1599999964237213) ? 'rgba(115, 217, 41, 0.3)' : 'rgba(230, 33, 56, 0.3)';
+                    }
+                    commentBox.style.border = 'none'; // Remove border for filled style
+
+                    // Apply zoom scaling to the entire box
+                    commentBox.style.transform = `scale(${zoomLevel})`;
+                    commentBox.style.transformOrigin = 'top left';
+                }else{
+                    // Set border color based on annotation type
+                    if(!comment.toggleCount){
+                        commentBox.style.borderColor = 'rgba(0,0,255,1)'; // Initial color blue
+                    }else{
+                        commentBox.style.borderColor = (comment.color[0] === 0.41999998688697815 && comment.color[1] === 0.8500000238418579 && comment.color[2] === 0.1599999964237213) ? 'rgba(115, 217, 41, 1)' : 'rgba(230, 33, 56, 1)';
+                    }
+                    // Adjust border thickness based on zoom level
+                    commentBox.style.borderWidth = `${2 / zoomLevel}px`;
+
+                    // Apply zoom scaling to the entire box
+                    commentBox.style.transform = `scale(${zoomLevel})`;
+                    commentBox.style.transformOrigin = 'top left';
+                }
+
+                
+                commentBox.onmouseenter = null;
+                commentBox.onmouseleave = null;
+                
+
+                // Click event for showing comment details
+                commentBox.onclick = () => showCommentDetails(comment);
+
+                // Double-click event to toggle comment color
+                commentBox.ondblclick = () => toggleComment(comment, commentBox);
+
+
+                pageDiv.appendChild(commentBox);
+                updateRemainingCommentCount();
+            });
+        }
+
+    
+
+        async function toggleComment(clickedComment, clickedBox) {
+            let newColor;
+
+            if (!clickedComment.toggleCount) {
+                clickedComment.toggleCount = 0;
+            }
+
+            if (clickedComment.toggleCount === 0) {
+                newColor = [0.8999999761581421, 0.12999999523162842, 0.2199999988079071]; // Red (First toggle)
+            } else {
+                newColor = (clickedComment.toggleCount % 2 === 0) 
+                    ? [0.8999999761581421, 0.12999999523162842, 0.2199999988079071] // Red
+                    : [0.41999998688697815, 0.8500000238418579, 0.1599999964237213]; // Green
+            }
+            clickedComment.toggleCount++;
+            
+            const newLabel = newColor[0] === 0.41999998688697815 && newColor[1] === 0.8500000238418579 && newColor[2] === 0.1599999964237213 ? 'nonIoC': 'IoC'  ;
+
+            const response = await fetch('/toggle_annotation', {
+                method: 'POST',
+                headers: {
+                    'Content-Type': 'application/json',
+                },
+                body: JSON.stringify({ title: clickedComment.title, label: newLabel }),
+            });
+            
+            if (response.ok) {
+                pdfData.pages.forEach(page => {
+                    page.comments.forEach(comment => {
+                        if (comment.title === clickedComment.title) {
+                            comment.toggleCount = clickedComment.toggleCount;
+                            comment.color = newColor;
+
+                        }
+                    });
+                });
+
+                document.querySelectorAll('.comment-box').forEach(box => {
+                    if (box.getAttribute('data-title') === clickedComment.title) {
+                        if(filledAnnotationStyle){
+                            box.style.backgroundColor = newLabel === 'nonIoC' ? [.41999998688697815, .8500000238418579, .1599999964237213] : [0.8999999761581421, 0.12999999523162842, 0.2199999988079071];
+                        }else{
+                            box.style.borderColor = newLabel === 'nonIoC' ? [.41999998688697815, .8500000238418579, .1599999964237213] : [0.8999999761581421, 0.12999999523162842, 0.2199999988079071];
+                        }
+                    }
+                });
+
+                pdfData.pages.forEach((page, index) => {
+                    const pageDiv = document.getElementById('pdf-container').querySelectorAll('.page-div')[index];
+                    const img = pageDiv.querySelector('img');
+                    renderAnnotations(page, pageDiv, img);
+                });
+
+                const replies = document.getElementById('replies');
+
+                const now = new Date();
+                const day = now.getDay(); // returns a number representing the day of the week, starting with 0 for Sunday
+                const hours = now.getHours();
+                const minutes = now.getMinutes();
+                const seconds = now.getSeconds();   
+
+                replyText = "You changed the Label to " + newLabel + " on " + now;
+
+                const response = await fetch('/add_reply', {
+                    method: 'POST',
+                    headers: { 'Content-Type': 'application/json' },
+                    body: JSON.stringify({ title: selectedComment.title, reply: replyText })
+                });
+
+                if (response.ok) {
+                    // Update local data to reflect the new reply
+                    if (!selectedComment.replies) selectedComment.replies = [];
+                    // selectedComment.replies.push({ user: 'System', text: replyText });
+                    
+                    pdfData.pages.forEach(page => {
+                        page.comments.forEach(comment => {
+                            if (comment.title === clickedComment.title) {
+                                if (!comment.replies) comment.replies = [];
+                                comment.replies.push({ user: 'System', text: replyText });
+                            }
+                        });
+                    });
+
+                    // Update the displayed replies
+                    showCommentDetails(selectedComment);
+                }
+
+
+                updateRemainingCommentCount();
+
+            } else {
+                console.error('Failed to update annotation label');
+            }
+        }
+
+        function downloadCSV() {
+            stopAndSendTime();
+            window.location.href = '/download_csv';
+
+        }
+
+        function downloadJSON() {
+            stopAndSendTime();
+            window.location.href = '/download_json';
+        }
+
+        window.addEventListener('resize', () => {
+            if (pdfData) {
+                const container = document.getElementById('pdf-container');
+                const pageDivs = container.querySelectorAll('.page-div');
+
+                pdfData.pages.forEach((page, index) => {
+                    const pageDiv = pageDivs[index];
+                    const img = pageDiv.querySelector('img');
+                    renderAnnotations(page, pageDiv, img);
+                });
+            }
+        });
+
+        document.getElementById('pdf-upload').addEventListener('change', uploadPDF);
+
+        function saveSeenPDFs() {
+            localStorage.setItem('seenPDFs', JSON.stringify([...seenPDFs]));
+        }
+
+        function loadSeenPDFs() {
+            const storedSeenPDFs = localStorage.getItem('seenPDFs');
+            if (storedSeenPDFs) {
+                seenPDFs.clear();
+                JSON.parse(storedSeenPDFs).forEach(pdf => seenPDFs.add(pdf));
+            }
+        }
+
+        // Call this on page load to restore the state
+        window.addEventListener('load', loadSeenPDFs);
+
+        // Save the state whenever a checkbox is toggled
+        window.addEventListener('beforeunload', saveSeenPDFs);
+    </script>
+</body>
+</html>

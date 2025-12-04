@@ -1,9 +1,0 @@
-This work claim that indicator of compromise (IoC) extraction models perform better when trained on datasets created by LANCE.
-
-To support this claim we generate a dataset from 450 reports using LANCE with ChatGPT 4o as the underline LLM and we use that dataset to train IoC Miner (an IoC extraction tool).
-We compare the performance on the IoC Miner trained on that dataset, to the IoC Miner trained on the dataset created with the method in the original paper (Regular Expression based extraction and VirusTotal based filtering).
-We evaluate the two differently trained IoC Miner models on the PRISM dataset and we show that the one trained on the LANCE generated dataset is the best performing.
-
-The dataset created from the 450 (+ the 50 reports from PRISM) reports, including the indicators, labels, LANCE generated justifications and PDFs for the UI (claim 2) is available in /artifact/500.
-Running the code to recreate it as it would be very costly in terms of time and money for the reviewer(s).
-That being said the code that was used was the same as the one in claim 5, and the reports are available on ORKL.eu by searching with the hash (used as the file name).
