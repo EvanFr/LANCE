@@ -64,7 +64,7 @@ Outputs & Where to Look
 
 Citation
 --------
-Please cite the accompanying paper when using these artifacts. Below is a placeholder BibTeX entry; replace with the paper's official citation.
+Please cite the accompanying paper when using these artifacts.
 
 ```bibtex
 @article{froudakisrevealing,
