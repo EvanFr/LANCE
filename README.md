@@ -3,7 +3,7 @@ LANCE — Detecting True Indicators from LLM Outputs
 
 Summary
 -------
-This folder contains the final release of artifacts, code, and instructions supporting the paper: "Revealing the True Indicators: Understanding and Improving IoC Extraction From Threat Reports". This repository contains the final LANCE release: the LANCE framework for IoC extraction, the PRISM ground‑truth dataset (50 hand‑annotated reports), and an interactive UI for manual analysis and IoC labeling.
+This repository contains the final release of artifacts, code, and instructions supporting the paper: "Revealing the True Indicators: Understanding and Improving IoC Extraction From Threat Reports". This repository contains the final LANCE release: the LANCE framework for IoC extraction, the PRISM ground‑truth dataset (50 hand‑annotated reports), and an interactive UI for manual analysis and IoC labeling.
 
 
 Contents
