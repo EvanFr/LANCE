@@ -1,4 +1,5 @@
-LANCE — Detecting True Indicators from LLM Outputs
+Revealing the True Indicators:
+Understanding and Improving IoC Extraction From Threat Reports
 ===============================================
 
 Summary
